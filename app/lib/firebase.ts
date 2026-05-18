@@ -1,20 +1,22 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: "adweb-eindopdracht-33ef7.firebaseapp.com",
-  projectId: "adweb-eindopdracht-33ef7",
-  storageBucket: "adweb-eindopdracht-33ef7.firebasestorage.app",
-  messagingSenderId: "358119888730",
-  appId: "1:358119888730:web:65cb6b69ea53ae5466c563",
-  measurementId: "G-8G23DVCTH5"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-const db = initializeApp(firebaseConfig);
-const analytics = getAnalytics(db);
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const db = getFirestore(app);
 
-export { 
-    db, 
-    analytics 
+export {
+    analytics,
+    db
 };
