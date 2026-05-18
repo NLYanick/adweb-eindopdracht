@@ -4,5 +4,6 @@ import { collection, doc, getDocs } from "firebase/firestore";
 export async function getUsers() {
     const userDocs = await getDocs(collection(db, "users"));
     const users = userDocs.docs.map(doc => doc.data());
-    return users
+    
+    return users as any[];
 }
