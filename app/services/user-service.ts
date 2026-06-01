@@ -1,9 +1,14 @@
 import { db } from "../lib/firebase";
-import { collection, doc, getDocs } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 
-export async function getUsers() {
-    const userDocs = await getDocs(collection(db, "users"));
-    const users = userDocs.docs.map(doc => doc.data());
-    
-    return users as any[];
+export function watchUsers(callback: (users: any[]) => void) {
+    const usersCollection = collection(db, "users");
+
+    const unsubscribe = onSnapshot(usersCollection, (snapshot) => {
+        const users = snapshot.docs.map(doc => doc.data());
+        
+        callback(users);
+    });
+
+    return unsubscribe;
 }
