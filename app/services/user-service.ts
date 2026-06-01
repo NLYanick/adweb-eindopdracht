@@ -1,7 +1,8 @@
 import { db } from "../lib/firebase";
-import { collection, doc, getDoc, onSnapshot, setDoc, waitForPendingWrites } from "firebase/firestore";
+import { collection, doc, getDoc, onSnapshot, setDoc } from "firebase/firestore";
 import { UserProfile } from "../lib/schemas";
 
+// TODO: Remove in future, is not needed
 export function watchUsers(callback: (users: UserProfile[]) => void) {
     const usersCollection = collection(db, "users");
 

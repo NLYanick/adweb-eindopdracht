@@ -15,6 +15,7 @@ type AuthContextType = {
   register: (email: string, password: string, name: string) => Promise<boolean>;
 };
 
+// This component will wrap our entire app and provide the authenticated user and functions to all child components
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -32,13 +33,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      getUser(currentUser.uid).then((userProfile) => {
+      getUser(currentUser.uid).then((userProfile) => { // Get the user profile from Firestore
         setUser(userProfile ?? null);
         setLoading(false);
       });
     });
 
-    return () => unsubscribe(); 
+    return () => unsubscribe(); // Cleanup the listener on unmount
   }, [user]);
 
   async function login(email: string, password: string) {
@@ -87,6 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
+  
   if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 };

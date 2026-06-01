@@ -1,3 +1,4 @@
+// Firebase has it's own User type, but this one extends it. Future proof :)
 export type UserProfile = {
   uid: string;
   email: string;
