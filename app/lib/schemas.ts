@@ -1,8 +1,7 @@
-export type User = {
+export type UserProfile = {
   uid: string;
   email: string;
   name: string;
-  password: string;
 }
 
 export type Budgetbook = {
