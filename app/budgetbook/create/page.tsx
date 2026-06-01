@@ -1,5 +1,7 @@
 "use client";
+import { useAuth } from "@/app/context/AuthContext";
 import { createBudgetBook } from "@/app/services/budgetbook-service";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -8,10 +10,11 @@ export default function New() {
   const [description, setDescription] = useState("");
 
   const router = useRouter();
+  const { user } = useAuth();
   
   const onSubmit = async () => {
     createBudgetBook({
-      owner: "currentUserUid", 
+      owner: user?.uid || "", 
       name,
       description
     });
@@ -22,6 +25,10 @@ export default function New() {
   return (
     <main className="p-24">
       <h1 className="text-3xl font-bold underline">Create New Budget Book</h1>
+
+      <Link href="/budgetbook" className="text-blue-500 hover:underline">
+        Back to Dashboard
+      </Link>
 
       <form onSubmit={onSubmit} className="flex flex-col gap-4 mt-4">
         <input 

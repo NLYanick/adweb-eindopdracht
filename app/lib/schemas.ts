@@ -10,4 +10,5 @@ export type Budgetbook = {
   owner: string; // userUid
   name: string;
   description?: string;
+  sharedWith?: string[]; // array of userUids
 }

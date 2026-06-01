@@ -14,7 +14,7 @@ export function watchBudgetBooks(callback: (budgetBooks: Budgetbook[]) => void) 
     return unsubscribe;
 }
 
-export async function createBudgetBook(budgetBook: Omit<Budgetbook, "uid">) {
+export async function createBudgetBook(budgetBook: Omit<Budgetbook, "uid" | "sharedWith">) {
     try {
         await addDoc(collection(db, "budgetbooks"), {
             owner: budgetBook.owner,

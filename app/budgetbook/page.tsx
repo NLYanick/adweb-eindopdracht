@@ -19,6 +19,10 @@ export default function Home() {
     <main className="p-24">
       <h1 className="text-3xl font-bold underline">Hello world!</h1>
 
+      <Link href="/" className="text-blue-500 hover:underline">
+        Back to Home
+      </Link>
+
       <ul>
         {budgetbooks.map((budgetbook: Budgetbook) => (
           <li key={budgetbook.uid}>{budgetbook.name}</li>
@@ -26,7 +30,9 @@ export default function Home() {
       </ul>
 
       <hr />
-      <Link href="/budgetbook/create">Create New Budget Book</Link>
+      <Link href="/budgetbook/create" className="text-blue-500 hover:underline">
+        Create New Budget Book
+      </Link>
     </main>
   );
 }

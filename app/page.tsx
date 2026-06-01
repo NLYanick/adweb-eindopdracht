@@ -28,7 +28,9 @@ export default function Home() {
     <main className="p-24">
       <h1 className="text-3xl font-bold underline">Hello world!</h1>
 
-      <Link href="/budgetbook">Dashboard</Link>
+      <Link href="/budgetbook" className="text-blue-500 hover:underline">
+        Dashboard
+      </Link>
       <hr />
 
       <p>Current User: { user ? user.name : "No user logged in" }</p>
