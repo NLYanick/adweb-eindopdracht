@@ -1,13 +1,15 @@
 "use client";
-import { watchUsers } from "../services/user-service";
+import Link from "next/link";
+import { Budgetbook } from "../lib/schemas";
+import { watchBudgetBooks } from "../services/budgetbook-service";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const [users, setUsers] = useState<any[]>([]);
+  const [budgetbooks, setBudgetBooks] = useState<Budgetbook[]>([]);
 
   useEffect(() => {
-    const unsubscribe = watchUsers((users) => {
-      setUsers(users);
+    const unsubscribe = watchBudgetBooks((budgetbooks) => {
+      setBudgetBooks(budgetbooks);
     });
 
     return () => unsubscribe();
@@ -18,10 +20,13 @@ export default function Home() {
       <h1 className="text-3xl font-bold underline">Hello world!</h1>
 
       <ul>
-        {users.map((user: any) => (
-          <li key={user.id}>{user.name}</li>
+        {budgetbooks.map((budgetbook: Budgetbook) => (
+          <li key={budgetbook.uid}>{budgetbook.name}</li>
         ))}
       </ul>
+
+      <hr />
+      <Link href="/budgetbook/create">Create New Budget Book</Link>
     </main>
   );
 }
