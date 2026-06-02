@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => unsubscribe(); // Cleanup the listener on unmount
-  }, [user]);
+  }, []);
 
   async function login(email: string, password: string) {
     const result = await signInWithEmailAndPassword(auth, email, password);

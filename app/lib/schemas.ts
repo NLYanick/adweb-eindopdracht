@@ -10,5 +10,6 @@ export type Budgetbook = {
   owner: string; // userUid
   name: string;
   description?: string;
+  archived?: boolean;
   sharedWith?: string[]; // array of userUids
 }

@@ -34,35 +34,52 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="p-24">
-      <h1>Login</h1>
+    <main className="flex items-center justify-center min-h-screen">
+      <div className="flex flex-col gap-4 max-w-sm w-full text-center">
+        <h1>Login</h1>
 
-      <form className="flex flex-col gap-4 max-w-sm" onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Email"
-          className="border p-2 rounded"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="border p-2 rounded"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <form
+          className="flex flex-col gap-4"
+          onSubmit={handleSubmit}
+        >
+          <input
+            type="email"
+            placeholder="Email"
+            className="border p-2 rounded"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
-          Login
-        </button>
-      </form>
+          <input
+            type="password"
+            placeholder="Password"
+            className="border p-2 rounded"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-      <hr />
+          <button
+            type="submit"
+            className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+          >
+            Login
+          </button>
+        </form>
 
-      <p>Don't have an account? <Link href="/auth/register" className="text-blue-500 hover:underline">Register here</Link></p>
+        <hr />
+
+        <p>
+          Don&apos;t have an account?{" "}
+          <Link
+            href="/auth/register"
+            className="text-blue-500 hover:underline"
+          >
+            Register here
+          </Link>
+        </p>
+      </div>
     </main>
   );
 }
