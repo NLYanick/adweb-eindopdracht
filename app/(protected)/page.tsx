@@ -1,9 +1,9 @@
 "use client";
 import Link from 'next/link'
-import { watchUsers } from "./services/user-service";
+import { watchUsers } from "../services/user-service";
 import { useEffect, useState } from "react";
-import { UserProfile } from './lib/schemas';
-import { useAuth } from './context/AuthContext';
+import { UserProfile } from '../lib/schemas';
+import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export default function Home() {
@@ -13,16 +13,12 @@ export default function Home() {
   const { user, loading, logout } = useAuth();
 
   useEffect(() => {
-    if(!user) {
-      router.push("/auth/login");
-    }
-
     const unsubscribe = watchUsers((users) => {
       setUsers(users);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [user]);
 
   return (
     <main className="p-24">

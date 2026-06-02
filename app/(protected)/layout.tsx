@@ -1,0 +1,28 @@
+"use client";
+
+import { useAuth } from "@/app/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+export default function ProtectedLayout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
+    const { user, loading } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (loading) return;
+
+        if (!user) {
+            router.push("/auth/login");
+        }
+    }, [user, loading, router]);
+
+    if (loading || !user) {
+        return null; // or loading spinner
+    }
+
+    return <>{children}</>;
+}

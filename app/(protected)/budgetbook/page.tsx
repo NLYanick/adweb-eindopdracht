@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
-import { Budgetbook } from "../lib/schemas";
-import { watchBudgetBooks } from "../services/budgetbook-service";
+import { Budgetbook } from "../../lib/schemas";
+import { watchBudgetBooks } from "../../services/budgetbook-service";
 import { useEffect, useState } from "react";
 
 export default function Home() {

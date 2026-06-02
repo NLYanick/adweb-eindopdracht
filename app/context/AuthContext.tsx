@@ -59,7 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function register(email: string, password: string, name: string) {
     const { user } = await createUserWithEmailAndPassword(auth, email, password);
-
+    if(!user) return false;
     await updateProfile(user, { displayName: name });
 
     const newUser = await createUser({
@@ -67,8 +67,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email: user.email || "",
       name: name
     });
-
-    if(!newUser) return false;
+    
+    // if(!newUser) return false;
     
     setUser({
       uid: user.uid,

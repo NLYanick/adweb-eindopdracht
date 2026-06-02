@@ -12,9 +12,9 @@ export default function LoginPage() {
   const { login, user } = useAuth();
 
   useEffect(() => {
-     if(user) {
+    if(user) {
       router.push("/");
-     }
+    }
   }, [user]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
