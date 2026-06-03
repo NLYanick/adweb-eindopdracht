@@ -3,6 +3,7 @@
 import { createTransaction } from "@/app/services/transaction-service";
 import { useParams } from "next/navigation";
 import { useState } from "react";
+import { btn } from "../lib/button";
 type Props = {
     id: string;
     className?: string;
@@ -11,7 +12,7 @@ export default function AddTransaction({ id, className }: Props) {
     const [show, setShow] = useState(false);
 
     const today = new Date().toISOString().split("T")[0];
-    const [type, setType] = useState<"expense" | "income">("expense");
+    const [type, setType] = useState<"expense" | "income">("income");
     const [amount, setAmount] = useState("");
     const [description, setDescription] = useState("");
     const [date, setDate] = useState(today);
@@ -34,27 +35,27 @@ export default function AddTransaction({ id, className }: Props) {
     };
 
     return (
-        <div className={className ?? ""}>
+        <div className={className ?? ""} onClick={() => setShow(false)}>
             <button
-                onClick={() => setShow(true)}
-                className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-400"
+                onClick={(e) => { setShow(true); e.stopPropagation() }}
+                className={btn.primary}
             >
                 Add Transaction
             </button>
 
             {show && (
-                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 w-full max-w-md flex flex-col gap-4">
+                <div onClick={() => setShow(false)} className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                    <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-lg p-6 w-full max-w-md flex flex-col gap-4">
                         <h2 className="text-xl font-bold">Add Transaction</h2>
 
                         <form onSubmit={onSubmit} className="flex flex-col gap-4">
-                            <div className="flex rounded overflow-hidden border w-fit">
+                            <div className="flex rounded overflow-hidden border w-full">
                                 <button
                                     type="button"
                                     onClick={() => setType("expense")}
-                                    className={`px-6 py-2 text-sm font-medium transition-colors ${type === "expense"
-                                            ? "bg-red-500 text-white"
-                                            : "bg-white text-gray-600 hover:bg-gray-50"
+                                    className={`px-6 py-2 text-sm font-medium transition-colors w-1/2 ${type === "expense"
+                                        ? btn.danger
+                                        : btn.clear
                                         }`}
                                 >
                                     Expense
@@ -62,25 +63,27 @@ export default function AddTransaction({ id, className }: Props) {
                                 <button
                                     type="button"
                                     onClick={() => setType("income")}
-                                    className={`px-6 py-2 text-sm font-medium transition-colors ${type === "income"
-                                            ? "bg-green-500 text-white"
-                                            : "bg-white text-gray-600 hover:bg-gray-50"
+                                    className={`px-6 py-2 text-sm font-medium transition-colors w-1/2 ${type === "income"
+                                        ? btn.success
+                                        : btn.clear
                                         }`}
                                 >
                                     Income
                                 </button>
                             </div>
-
-                            <input
-                                type="number"
-                                placeholder="Amount"
-                                className="border p-2 rounded"
-                                required
-                                min="0.01"
-                                step="0.01"
-                                value={amount}
-                                onChange={(e) => setAmount(e.target.value)}
-                            />
+                            <div className="flex items-center">
+                                <label className="flex text-3xl w-1/8 justify-center">{type === "expense" && "-" || "+"}</label>
+                                <input
+                                    type="number"
+                                    placeholder="Amount"
+                                    className="border p-2 rounded w-7/8"
+                                    required
+                                    min="0.01"
+                                    step="0.01"
+                                    value={amount}
+                                    onChange={(e) => setAmount(e.target.value)}
+                                />
+                            </div>
 
                             <input
                                 type="text"
@@ -102,13 +105,13 @@ export default function AddTransaction({ id, className }: Props) {
                                 <button
                                     type="button"
                                     onClick={() => setShow(false)}
-                                    className="px-4 py-2 rounded border text-gray-600 hover:bg-gray-50"
+                                    className={btn.secondary}
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-400"
+                                    className={btn.primary}
                                 >
                                     Add
                                 </button>

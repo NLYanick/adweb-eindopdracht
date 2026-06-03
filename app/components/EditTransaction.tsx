@@ -1,0 +1,152 @@
+"use client";
+
+import { useState } from "react";
+import { Transaction } from "../lib/schemas";
+import { deleteTransaction, updateTransaction } from "../services/transaction-service";
+import { btn } from "../lib/button";
+
+type Props = {
+    transaction: Transaction;
+    onClose: () => void;
+};
+
+export default function EditTransaction({ transaction, onClose }: Props) {
+    const [showDelete, setShowDelete] = useState(false);
+    const [type, setType] = useState<"expense" | "income">(transaction.amount < 0 ? "expense" : "income");
+    const [amount, setAmount] = useState(Math.abs(transaction.amount).toString());
+    const [description, setDescription] = useState(transaction.description ?? "");
+    const [date, setDate] = useState(transaction.date);
+
+    const onSubmit = async (e: React.SubmitEvent) => {
+        e.preventDefault();
+        await updateTransaction(transaction.uid, {
+            budgetbook: transaction.budgetbook,
+            amount: type === "expense" ? -parseFloat(amount) : parseFloat(amount),
+            description,
+            date,
+        });
+        onClose();
+    };
+
+    const removeTransaction = async () => {
+        await deleteTransaction(transaction.uid);
+        onClose();
+    };
+
+    return (
+        <div>
+            <div onClick={() => onClose()} className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-lg p-6 w-full max-w-md flex flex-col gap-4">
+                    <h2 className="text-xl font-bold">Add Transaction</h2>
+
+                    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+                        <div className="flex rounded overflow-hidden border w-full">
+                            <button
+                                type="button"
+                                onClick={() => setType("expense")}
+                                className={`px-6 py-2 text-sm font-medium transition-colors w-1/2 ${type === "expense"
+                                    ? btn.danger
+                                    : btn.clear
+                                    }`}
+                            >
+                                Expense
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setType("income")}
+                                className={`px-6 py-2 text-sm font-medium transition-colors w-1/2 ${type === "income"
+                                    ? btn.success
+                                    : btn.clear
+                                    }`}
+                            >
+                                Income
+                            </button>
+                        </div>
+                        <div className="flex items-center">
+                            <label className="flex text-3xl w-1/8 justify-center">{type === "expense" && "-" || "+"}</label>
+                            <input
+                                type="number"
+                                placeholder="Amount"
+                                className="border p-2 rounded w-7/8"
+                                required
+                                min="0.01"
+                                step="0.01"
+                                value={amount}
+                                onChange={(e) => setAmount(e.target.value)}
+                            />
+                        </div>
+
+                        <input
+                            type="text"
+                            placeholder="Description"
+                            className="border p-2 rounded"
+                            maxLength={100}
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                        />
+
+                        <input
+                            type="date"
+                            className="border p-2 rounded"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                        />
+
+                        <div className="flex gap-2 justify-between">
+                            <button
+                                type="button"
+                                onClick={() => setShowDelete(true)}
+                                className={btn.danger}
+                            > Delete </button>
+                            <div>
+                                <button
+                                    type="button"
+                                    onClick={() => onClose()}
+                                    className={btn.secondary}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className={btn.primary}
+                                >
+                                    Add
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {showDelete && (
+                <div
+                    className="fixed inset-0 bg-black/60 flex items-center justify-center z-60"
+                    onClick={() => setShowDelete(false)}
+                >
+                    <div
+                        className="bg-white rounded-lg p-6 w-full max-w-sm flex flex-col gap-4"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h2 className="text-xl font-bold">Delete Transaction</h2>
+                        <p className="text-gray-600">Are you sure you want to delete this transaction? This cannot be undone.</p>
+                        <div className="flex gap-2 justify-end">
+                            <button
+                                type="button"
+                                onClick={() => setShowDelete(false)}
+                                className={btn.secondary}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={removeTransaction}
+                                className={btn.danger}
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    )
+}
