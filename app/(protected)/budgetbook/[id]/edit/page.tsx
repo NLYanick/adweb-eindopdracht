@@ -14,7 +14,6 @@ export default function EditBudgetBookPage() {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
 
-    const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
@@ -33,7 +32,6 @@ export default function EditBudgetBookPage() {
 
             setName(data.name);
             setDescription(data.description || "");
-            setLoading(false);
         };
 
     fetchData();
@@ -53,7 +51,6 @@ export default function EditBudgetBookPage() {
         router.push(`/budgetbook`);
     };
 
-    if (loading) return <main className="p-24">Loading...</main>;
     return (
         <main className="p-24">
         <h1 className="text-3xl font-bold underline">Edit the Budget Book</h1>

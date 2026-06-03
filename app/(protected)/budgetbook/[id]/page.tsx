@@ -18,7 +18,7 @@ export default function BudgetBookDetailPage() {
 
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
-    const { user, loading } = useAuth();
+    const { user } = useAuth();
 
     const now = new Date();
     const [month, setMonth] = useState(now.getMonth() + 1);
