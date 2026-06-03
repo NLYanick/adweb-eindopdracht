@@ -6,6 +6,7 @@ import { restoreBudgetBook } from "@/app/services/budgetbook-service";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { useSearchParams } from "next/navigation";
+import BudgetBookItem from "@/app/components/BudgeBookRow";
 
 export default function Home() {
   const searchParams = useSearchParams();
@@ -55,35 +56,6 @@ export default function Home() {
         ))}
       </ul>
     </main>
-  );
-}
-
-function BudgetBookItem({ budgetbook }: { budgetbook: Budgetbook }) {
-  return (
-    <li className="border p-3 rounded grid grid-cols-[20ch_1fr_auto] items-center gap-4">
-      <span className="truncate font-medium">
-        {budgetbook.name}
-      </span>
-
-      <span className="text-gray-600 truncate">
-        {budgetbook.description}
-      </span>
-      {budgetbook.archived ? (
-        <button
-          onClick={() => restoreBudgetBook(budgetbook.uid)}
-          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-400"
-        >
-          Restore
-        </button>
-      ) : (
-        <Link
-          href={`/budgetbook/${budgetbook.uid}`}
-          className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-400"
-        >
-          Detail
-        </Link>
-      )}
-    </li>
   );
 }
 

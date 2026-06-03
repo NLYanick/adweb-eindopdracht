@@ -11,7 +11,7 @@ export default function AddTransaction({ id, className }: Props) {
     const [show, setShow] = useState(false);
 
     const today = new Date().toISOString().split("T")[0];
-    const [type, setType] = useState<"expense" | "income">("expense");
+    const [type, setType] = useState<"expense" | "income">("income");
     const [amount, setAmount] = useState("");
     const [description, setDescription] = useState("");
     const [date, setDate] = useState(today);
@@ -48,13 +48,13 @@ export default function AddTransaction({ id, className }: Props) {
                         <h2 className="text-xl font-bold">Add Transaction</h2>
 
                         <form onSubmit={onSubmit} className="flex flex-col gap-4">
-                            <div className="flex rounded overflow-hidden border w-fit">
+                            <div className="flex rounded overflow-hidden border w-full">
                                 <button
                                     type="button"
                                     onClick={() => setType("expense")}
-                                    className={`px-6 py-2 text-sm font-medium transition-colors ${type === "expense"
-                                            ? "bg-red-500 text-white"
-                                            : "bg-white text-gray-600 hover:bg-gray-50"
+                                    className={`px-6 py-2 text-sm font-medium transition-colors w-1/2 ${type === "expense"
+                                        ? "bg-red-500 text-white"
+                                        : "bg-white text-gray-600 hover:bg-gray-50"
                                         }`}
                                 >
                                     Expense
@@ -62,25 +62,27 @@ export default function AddTransaction({ id, className }: Props) {
                                 <button
                                     type="button"
                                     onClick={() => setType("income")}
-                                    className={`px-6 py-2 text-sm font-medium transition-colors ${type === "income"
-                                            ? "bg-green-500 text-white"
-                                            : "bg-white text-gray-600 hover:bg-gray-50"
+                                    className={`px-6 py-2 text-sm font-medium transition-colors w-1/2 ${type === "income"
+                                        ? "bg-green-500 text-white"
+                                        : "bg-white text-gray-600 hover:bg-gray-50"
                                         }`}
                                 >
                                     Income
                                 </button>
                             </div>
-
-                            <input
-                                type="number"
-                                placeholder="Amount"
-                                className="border p-2 rounded"
-                                required
-                                min="0.01"
-                                step="0.01"
-                                value={amount}
-                                onChange={(e) => setAmount(e.target.value)}
-                            />
+                            <div className="flex items-center">
+                                <label className="flex text-3xl w-1/8 justify-center">{type === "expense" && "-" || "+"}</label>
+                                <input
+                                    type="number"
+                                    placeholder="Amount"
+                                    className="border p-2 rounded w-7/8"
+                                    required
+                                    min="0.01"
+                                    step="0.01"
+                                    value={amount}
+                                    onChange={(e) => setAmount(e.target.value)}
+                                />
+                            </div>
 
                             <input
                                 type="text"

@@ -87,8 +87,11 @@ export default function BudgetBookDetailPage() {
                     Edit
                 </Link>
             </div>
-
-            {/* ✅ Stats (simple, inline like your UI) */}
+            <div className="flex items-center gap-4 mb-2 justify-center">
+                <button onClick={prevMonth} className="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&lt;</button>
+                <span className="font-medium w-40 text-center">{monthLabel}</span>
+                <button onClick={nextMonth} className="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&gt;</button>
+            </div>
             <div className="grid grid-cols-3 gap-4 mb-6">
 
                 {/* Balance */}
@@ -111,10 +114,11 @@ export default function BudgetBookDetailPage() {
             </div>
 
             <hr />
+            
             <AddTransaction id={id} className="flex my-3 justify-end"/>
-            {/* ✅ Transactions list (MATCHES your budgetbook style) */}
+
             {transactions.toSorted((a, b) => new Date(b.date).getDay() - new Date(a.date).getDay()).map((t) => (
-                <TransactionRow transaction={t} />
+                <TransactionRow key={t.uid} transaction={t} />
             ))}
         </div>
     )
