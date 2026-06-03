@@ -10,6 +10,7 @@ import { watchTransactions, watchTransactionsByMonth } from "@/app/services/tran
 import { Transaction } from "@/app/lib/schemas";
 import AddTransaction from "@/app/components/AddTransaction";
 import TransactionRow from "@/app/components/TransactionRow";
+import EditTransaction from "@/app/components/EditTransaction";
 
 export default function BudgetBookDetailPage() {
     const { id } = useParams<{ id: string }>();
@@ -22,6 +23,11 @@ export default function BudgetBookDetailPage() {
     const now = new Date();
     const [month, setMonth] = useState(now.getMonth() + 1);
     const [year, setYear] = useState(now.getFullYear());
+
+    const [debouncedMonth, setDebouncedMonth] = useState(month);
+    const [debouncedYear, setDebouncedYear] = useState(year);
+
+    const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
 
     useEffect(() => {
         if (!user) return;
@@ -44,18 +50,26 @@ export default function BudgetBookDetailPage() {
     }, [id, user]);
 
     useEffect(() => {
-        const unsubscribe = watchTransactionsByMonth(id, year, month, (t) => {
+        const timer = setTimeout(() => {
+            setDebouncedMonth(month);
+            setDebouncedYear(year);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [month, year]);
+
+    useEffect(() => {
+        const unsubscribe = watchTransactionsByMonth(id, debouncedYear, debouncedMonth, (t) => {
             setTransactions(t);
         });
         return () => unsubscribe();
-    }, [id, year, month]);
+    }, [id, debouncedYear, debouncedMonth]);
 
-    const prevMonth = () => {
+    const prevMonth = async () => {
         if (month === 1) { setMonth(12); setYear(y => y - 1); }
         else setMonth(m => m - 1);
     };
 
-    const nextMonth = () => {
+    const nextMonth = async () => {
         if (month === 12) { setMonth(1); setYear(y => y + 1); }
         else setMonth(m => m + 1);
     };
@@ -70,11 +84,11 @@ export default function BudgetBookDetailPage() {
     const income = transactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
     const expenses = transactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0);
 
-    const balance = income - expenses;
+    console.log(editingTransaction)
+
     return (
         <div className="m-9">
 
-            {/* ✅ Header (same style as your page) */}
             <div className="flex justify-between">
                 <div className="mb-4">
                     <h1 className="font-bold text-3xl">{name}</h1>
@@ -114,11 +128,17 @@ export default function BudgetBookDetailPage() {
             </div>
 
             <hr />
-            
-            <AddTransaction id={id} className="flex my-3 justify-end"/>
+
+            <AddTransaction id={id} className="flex my-3 justify-end" />
+            {editingTransaction && (
+                <EditTransaction
+                    transaction={editingTransaction}
+                    onClose={() => setEditingTransaction(null)}
+                />
+            )}
 
             {transactions.toSorted((a, b) => new Date(b.date).getDay() - new Date(a.date).getDay()).map((t) => (
-                <TransactionRow key={t.uid} transaction={t} />
+                <TransactionRow key={t.uid} transaction={t} onEdit={setEditingTransaction} />
             ))}
         </div>
     )
