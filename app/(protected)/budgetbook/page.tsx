@@ -75,10 +75,10 @@ function BudgetBookItem({ budgetbook }: { budgetbook: Budgetbook }) {
         </button>
       ) : (
         <Link
-          href={`/budgetbook/${budgetbook.uid}/edit`}
+          href={`/budgetbook/${budgetbook.uid}`}
           className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-400"
         >
-          Edit
+          Detail
         </Link>
       )}
     </li>

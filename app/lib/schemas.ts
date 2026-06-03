@@ -13,3 +13,11 @@ export type Budgetbook = {
   archived?: boolean;
   sharedWith?: string[]; // array of userUids
 }
+
+export type Transaction = {
+  uid: string;
+  budgetbook: string;
+  amount: number; // negative = expense, positive = income
+  description?: string;
+  date: string;
+}

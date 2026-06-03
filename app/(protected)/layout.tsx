@@ -21,8 +21,26 @@ export default function ProtectedLayout({
     }, [user, loading, router]);
 
     if (loading || !user) {
-        return null;
-    }
+    return (
+        <>
+            <nav className="border-b border-gray-200 bg-white px-6 py-3 flex items-center justify-between gap-6">
+                <div className="flex gap-6">
+                    <div className="h-4 w-16 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
+                </div>
+                <div className="h-8 w-16 bg-gray-200 rounded animate-pulse" />
+            </nav>
+            <main className="p-24">
+                <div className="flex flex-col gap-4 animate-pulse">
+                    <div className="h-8 w-48 bg-gray-200 rounded" />
+                    <div className="h-4 w-full bg-gray-200 rounded" />
+                    <div className="h-4 w-full bg-gray-200 rounded" />
+                    <div className="h-4 w-2/3 bg-gray-200 rounded" />
+                </div>
+            </main>
+        </>
+    );
+}
 
     return (
         <>

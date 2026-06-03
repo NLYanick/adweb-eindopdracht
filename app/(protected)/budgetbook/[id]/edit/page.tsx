@@ -21,20 +21,20 @@ export default function EditBudgetBookPage() {
         if (!user) return;
         const fetchData = async () => {
             const data = await getBudgetBook(id as string);
-        if (!data || data.archived == true) {
-            router.push("/budgetbook");
-            return;
-        }
+            if (!data || data.archived == true) {
+                router.push(`/budgetbook/${id}`);
+                return;
+            }
 
-        if (data.owner !== user?.uid) {
-            router.push("/budgetbook");
-            return;
-        }
+            if (data.owner !== user?.uid) {
+                router.push(`/budgetbook/${id}`);
+                return;
+            }
 
-        setName(data.name);
-        setDescription(data.description || "");
-        setLoading(false);
-    };
+            setName(data.name);
+            setDescription(data.description || "");
+            setLoading(false);
+        };
 
     fetchData();
     }, [id, user, router]);
@@ -44,16 +44,16 @@ export default function EditBudgetBookPage() {
             name: name,
             description: description,
         });
-        router.push("/budgetbook");
+        router.push(`/budgetbook/${id}`);
     };
 
     
     const handleArchive = async () => {
         await archiveBudgetBook(id as string);
-        router.push("/budgetbook");
+        router.push(`/budgetbook`);
     };
 
-    
+    if (loading) return <main className="p-24">Loading...</main>;
     return (
         <main className="p-24">
         <h1 className="text-3xl font-bold underline">Edit the Budget Book</h1>
@@ -88,7 +88,7 @@ export default function EditBudgetBookPage() {
                 <div className="flex gap-5">
                     <button
                         type="button"
-                        onClick={() => router.push("/budgetbook")}
+                        onClick={() => router.push(`/budgetbook/${id}`)}
                         className="bg-gray-400 text-white p-2 rounded  hover:bg-gray-500"
                     >
                         Cancel
