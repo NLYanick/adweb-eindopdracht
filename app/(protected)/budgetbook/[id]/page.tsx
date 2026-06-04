@@ -11,6 +11,8 @@ import { Transaction } from "@/app/lib/schemas";
 import AddTransaction from "@/app/components/AddTransaction";
 import TransactionRow from "@/app/components/TransactionRow";
 import EditTransaction from "@/app/components/EditTransaction";
+import TransactionsPanel from "@/app/components/TransactionsPanel";
+import TransactionPanel from "@/app/components/TransactionsPanel";
 
 export default function BudgetBookDetailPage() {
     const { id } = useParams<{ id: string }>();
@@ -28,6 +30,8 @@ export default function BudgetBookDetailPage() {
     const [debouncedYear, setDebouncedYear] = useState(year);
 
     const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+
+    const [tab, setTab] = useState<"transactions" | "categories">("transactions");
 
     useEffect(() => {
         if (!user) return;
@@ -53,7 +57,7 @@ export default function BudgetBookDetailPage() {
         const timer = setTimeout(() => {
             setDebouncedMonth(month);
             setDebouncedYear(year);
-        }, 300);
+        }, 200);
         return () => clearTimeout(timer);
     }, [month, year]);
 
@@ -129,17 +133,29 @@ export default function BudgetBookDetailPage() {
 
             <hr />
 
-            <AddTransaction id={id} className="flex my-3 justify-end" />
-            {editingTransaction && (
-                <EditTransaction
-                    transaction={editingTransaction}
-                    onClose={() => setEditingTransaction(null)}
-                />
-            )}
+            <div className="flex border-b mb-4">
+                <button
+                    onClick={() => setTab("transactions")}
+                    className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "transactions"
+                        ? "border-blue-500 text-black"
+                        : "border-transparent text-gray-500 hover:text-black"
+                        }`}
+                >
+                    Transactions
+                </button>
+                <button
+                    onClick={() => setTab("categories")}
+                    className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "categories"
+                        ? "border-blue-500 text-black"
+                        : "border-transparent text-gray-500 hover:text-black"
+                        }`}
+                >
+                    Categories
+                </button>
+            </div>
 
-            {transactions.toSorted((a, b) => new Date(b.date).getDay() - new Date(a.date).getDay()).map((t) => (
-                <TransactionRow key={t.uid} transaction={t} onEdit={setEditingTransaction} />
-            ))}
+            {tab === "transactions" && <TransactionPanel budgetbookId={id} month={month} year={year} />}
+            {/* {tab === "categories" && <CategoryPanel budgetbookId={id} month={month} year={year} />} */}
         </div>
     )
 }
