@@ -20,4 +20,13 @@ export type Transaction = {
   amount: number; // negative = expense, positive = income
   description?: string;
   date: string;
+  category?: string; // category uid
+}
+
+export type Category = {
+  uid: string;
+  budgetbook: string;
+  name: string;
+  budget: number;
+  endDate?: string;
 }
