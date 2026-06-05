@@ -92,17 +92,17 @@ export default function EditBudgetBookPage() {
             </div>
 
             <section className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
-                <p className="text-[11px] font-mono tracking-widest text-gray-400 uppercase mb-5">Information</p>
+                <h2 className="text-sm font-mono tracking-widest text-gray-400 uppercase mb-5">Information</h2>
                 <form onSubmit={onSubmit} className="flex flex-col gap-5">
                     <div>
-                        <label className="block text-xs font-mono text-gray-500 mb-1.5" htmlFor="name">Name</label>
+                        <label className="block text-sm font-mono text-gray-500 mb-1.5" htmlFor="name">Name</label>
                         <input id="name" type="text" placeholder="Name" required maxLength={50}
                             className="w-full bg-gray-50 border border-gray-200 rounded-md px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-black/5"
                             value={name} onChange={(e) => setName(e.target.value)} />
                         <p className="text-[11px] font-mono text-gray-400 mt-1">Max 50 characters</p>
                     </div>
                     <div>
-                        <label className="block text-xs font-mono text-gray-500 mb-1.5" htmlFor="desc">Description</label>
+                        <label className="block text-sm font-mono text-gray-500 mb-1.5" htmlFor="desc">Description</label>
                         <textarea id="desc" placeholder="Description" rows={3} maxLength={500}
                             className="w-full bg-gray-50 border border-gray-200 rounded-md px-3 py-2.5 text-sm text-gray-900 resize-none focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-black/5"
                             value={description} onChange={(e) => setDescription(e.target.value)} />
@@ -121,7 +121,7 @@ export default function EditBudgetBookPage() {
             </section>
 
             <section className="bg-white border border-gray-200 rounded-xl p-6">
-                <p className="text-[11px] font-mono tracking-widest text-gray-400 uppercase mb-5">Share with others</p>
+                <h2 className="text-sm font-mono tracking-widest text-gray-400 uppercase mb-5">Share with others</h2>
                 <div className="flex gap-2 items-start">
                     <div className="flex-1 space-y-2">
                         <SearchableDropdown array={users} onClick={setSelectedUser} />
