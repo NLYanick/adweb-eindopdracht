@@ -2,6 +2,7 @@ import Link from "next/link";
 import { restoreBudgetBook } from "../services/budgetbook-service";
 import { Budgetbook } from "../lib/schemas";
 import { useAuth } from "../context/AuthContext";
+import { btn } from "../lib/button";
 
 export default function BudgetBookItem({ budgetbook }: { budgetbook: Budgetbook }) {
   const { user } = useAuth();
@@ -30,7 +31,7 @@ export default function BudgetBookItem({ budgetbook }: { budgetbook: Budgetbook 
       ) : (
         <Link
           href={`/budgetbook/${budgetbook.uid}`}
-          className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-400"
+          className={btn.success}
         >
           Detail
         </Link>

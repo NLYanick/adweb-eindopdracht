@@ -59,7 +59,7 @@ export default function ProtectedLayout({
                         Budget Books
                     </Link>
                 </div>
-                <button onClick={logout} className="bg-red-500 text-white p-2 rounded hover:bg-red-600">
+                <button onClick={logout} className="bg-red-500 font-bold text-white p-2 rounded hover:bg-red-600">
                     Log out
                 </button>
             </nav>

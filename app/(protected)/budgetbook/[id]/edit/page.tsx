@@ -7,6 +7,8 @@ import { useAuth } from "@/app/context/AuthContext";
 import { watchUsers } from "@/app/services/user-service";
 import { UserProfile } from "@/app/lib/schemas";
 import SearchableDropdown from "@/app/components/SearchableDropdown";
+import { btn } from "@/app/lib/button";
+import Link from "next/link";
 
 export default function EditBudgetBookPage() {
     const { id } = useParams();
@@ -31,7 +33,7 @@ export default function EditBudgetBookPage() {
                 return;
             }
 
-            if (data.owner !== user?.uid) {
+            if (data.owner !== user?.uid && !data.sharedWith?.includes(user.uid)) {
                 router.push(`/budgetbook/${id}`);
                 return;
             }
@@ -88,19 +90,22 @@ export default function EditBudgetBookPage() {
             <h1 className="text-3xl font-bold underline">Edit the Budget Book</h1>
 
             <form onSubmit={onSubmit} className="flex flex-col gap-4 mt-4">
+                <h2 className="text-2xl font-bold">Information</h2>
+                <strong>Budget Book Name</strong>
                 <input
                     type="text"
                     placeholder="Name"
-                    className="border p-2"
+                    className="border p-2 rounded"
                     required
                     maxLength={50}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                 />
                 <em>Max 50 characters</em>
+                <strong>Description</strong>
                 <textarea
                     placeholder="Description"
-                    className="border p-2"
+                    className="border p-2 rounded"
                     value={description}
                     maxLength={500}
                     onChange={(e) => setDescription(e.target.value)}
@@ -118,14 +123,14 @@ export default function EditBudgetBookPage() {
                         <button
                             type="button"
                             onClick={() => router.push(`/budgetbook/${id}`)}
-                            className="bg-gray-400 text-white p-2 rounded  hover:bg-gray-500"
+                            className={btn.secondary}
                         >
                             Cancel
                         </button>
 
                         <button
                             type="submit"
-                            className="bg-blue-500 text-white p-2 rounded  hover:bg-blue-400"
+                            className={btn.primary}
                         >
                             Save
                         </button>
@@ -133,7 +138,9 @@ export default function EditBudgetBookPage() {
                 </div>
             </form>
 
-            <div className="mt-6 border rounded p-4">
+            <hr className="my-8" />
+
+            <div className="border rounded p-4">
                 <h2 className="text-xl font-bold mb-4">Share Budget Book</h2>
 
                 <div className="flex gap-2">
@@ -144,14 +151,14 @@ export default function EditBudgetBookPage() {
                             {selectedUser && (
                                 <div className="flex items-center gap-2 border-2 p-2 rounded shadow-lg">
                                     <span>{selectedUser.email}</span>
-                                    <button onClick={() => setSelectedUser(null)} className="text-red-500 hover:text-red-700">&times;</button>
+                                    <button onClick={() => setSelectedUser(null)} className="font-bold text-red-500 hover:text-red-700">&times;</button>
                                 </div>
                             )}
                         </div>
                     </div>
 
                     <button
-                        className="bg-blue-500 text-white p-2 rounded hover:bg-blue-400 h-max"
+                        className={`${btn.primary} h-fit`}
                         onClick={handleOnClick}
                         disabled={!selectedUser}
                     >
@@ -175,7 +182,7 @@ export default function EditBudgetBookPage() {
 
                             <button
                                 onClick={handleArchive}
-                                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-400"
+                                className={btn.secondary}
                             >
                                 Yes, archive
                             </button>

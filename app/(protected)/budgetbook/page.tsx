@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { useSearchParams } from "next/navigation";
 import BudgetBookItem from "@/app/components/BudgeBookRow";
+import { btn } from "@/app/lib/button";
 
 export default function Home() {
-  const searchParams = useSearchParams();
   const [showArchived, setArchived] = useState(false);
   const { loading, user } = useAuth();
   const [budgetbooks, setBudgetBooks] = useState<Budgetbook[]>([]);
@@ -39,7 +39,7 @@ export default function Home() {
         {!showArchived &&
           <Link
             href="/budgetbook/create"
-            className="bg-blue-500 text-white p-2 rounded  hover:bg-blue-400"
+            className={btn.primary}
           >
             Create new
           </Link>
