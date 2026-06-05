@@ -4,23 +4,23 @@ import { Transaction } from "../lib/schemas";
 import { watchTransactionsByMonth } from "../services/transaction-service";
 import TransactionRow from "./TransactionRow";
 import EditTransaction from "./EditTransaction";
-import { useTransactionsByMonth } from "../hooks/useTransactionsByMonth";
 
 type Props = {
   budgetbookId: string;
   month: number;
   year: number;
 };
-
+// DIT IS GWN DE TransactionPanel GECOPY PASTE DUS ER MOETEN NOG DINGEN ANDERS GEMAAKT WORDEN
 export default function TransactionPanel({ budgetbookId, month, year }: Props) {
-  const transactions = useTransactionsByMonth(
-    budgetbookId,
-    year,
-    month
-  );
-
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
 
+  useEffect(() => {
+    const unsubscribe = watchTransactionsByMonth(budgetbookId, year, month, (t) => {
+      setTransactions(t);
+    });
+    return () => unsubscribe();
+  }, [budgetbookId, year, month]);
 
   return (
     <div>
