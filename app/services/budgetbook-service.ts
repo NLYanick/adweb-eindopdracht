@@ -1,5 +1,5 @@
 import { db } from "../lib/firebase";
-import { addDoc, collection, doc, getDoc, onSnapshot, serverTimestamp, updateDoc, query, where } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, onSnapshot, serverTimestamp, updateDoc, query, where, or, and } from "firebase/firestore";
 import { Budgetbook } from "../lib/schemas";
 import { getUsersByEmail } from "./user-service";
 
@@ -7,8 +7,13 @@ export function watchBudgetBooks(userId: string, showArchived:boolean,callback: 
     if(!userId) return function(){};
     const budgetBooksCollection = query(
         collection(db, "budgetbooks"),
-        where("owner", "==", userId),
-        where("archived", "==", showArchived)
+        and(
+            or(
+                where("owner", "==", userId),
+                where("sharedWith", "array-contains", userId)
+            ),
+            where("archived", "==", showArchived)
+        )
     )
 
     const unsubscribe = onSnapshot(budgetBooksCollection, (snapshot) => {
