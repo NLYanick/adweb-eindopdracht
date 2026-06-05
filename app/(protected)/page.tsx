@@ -1,16 +1,8 @@
 "use client";
-import Link from 'next/link'
-import { watchUsers } from "../services/user-service";
-import { useEffect, useState } from "react";
-import { UserProfile } from '../lib/schemas';
 import { useAuth } from '../context/AuthContext';
-import { useRouter,useSearchParams } from 'next/navigation';
 
 export default function Home() {
-  const [users, setUsers] = useState<UserProfile[]>([]);
-
-  const router = useRouter();
-  const { user, loading, logout } = useAuth();
+  const { user } = useAuth();
 
   return (
     <main className="p-24">
