@@ -45,10 +45,6 @@ export default function BudgetBookDetailPage() {
                 return;
             }
 
-            console.log(data.sharedWith)
-            console.log(user.uid)
-            console.log(data.sharedWith?.includes(user.uid))
-
             if (data.owner !== user?.uid && !data.sharedWith?.includes(user.uid)) {
                 router.push("/budgetbook");
                 return;
