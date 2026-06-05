@@ -4,6 +4,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Link from "next/link";
+import { btn } from "../lib/button";
 
 export default function ProtectedLayout({
     children,
@@ -59,7 +60,7 @@ export default function ProtectedLayout({
                         Budget Books
                     </Link>
                 </div>
-                <button onClick={logout} className="bg-red-500 font-bold text-white p-2 rounded hover:bg-red-600">
+                <button onClick={logout} className={btn.danger}>
                     Log out
                 </button>
             </nav>

@@ -28,18 +28,6 @@ export function watchBudgetBooks(userId: string, showArchived:boolean,callback: 
     return unsubscribe;
 }
 
-export function watchSharedWith(budgetBookId: string, callback: (sharedWith: string[]) => void) { 
-    const docRef = doc(db, "budgetbooks", budgetBookId);
-    
-    const unsubscribe = onSnapshot(docRef, (snapshot) => {
-        const sharedWith: string[] = snapshot.data()?.sharedWith || [];
-
-        callback(sharedWith);
-    });
-
-    return unsubscribe;
-}
-
 export async function getBudgetBook(id: string): Promise<Budgetbook | null> {
     const docRef = doc(db, "budgetbooks", id);
     const docSnap = await getDoc(docRef);

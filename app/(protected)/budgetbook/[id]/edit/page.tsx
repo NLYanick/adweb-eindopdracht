@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { updateBudgetBook, getBudgetBook, archiveBudgetBook, shareBudgetBook, watchSharedWith } from "@/app/services/budgetbook-service";
+import { updateBudgetBook, getBudgetBook, archiveBudgetBook, shareBudgetBook } from "@/app/services/budgetbook-service";
 import { useAuth } from "@/app/context/AuthContext";
 import { watchUsers } from "@/app/services/user-service";
 import { UserProfile } from "@/app/lib/schemas";
@@ -17,10 +17,11 @@ export default function EditBudgetBookPage() {
 
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
+    const [sharedWith, setSharedWith] = useState<string[]>([]);
+    const [owner, setOwner] = useState<string>("");
 
     const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
     const [users, setUsers] = useState<UserProfile[]>([]);
-    const [sharedWith, setSharedWith] = useState<string[]>([]);
 
     const [showModal, setShowModal] = useState(false);
 
@@ -40,26 +41,24 @@ export default function EditBudgetBookPage() {
 
             setName(data.name);
             setDescription(data.description || "");
+            setSharedWith(data.sharedWith || []);
+            setOwner(data.owner);
         };
 
         fetchData();
-    }, [id, user, router]);
+    }, [id, user, router, sharedWith]);
 
     useEffect(() => {
         const unsubscribe = watchUsers((users) => {
             const filteredUsers = users
                 .filter(u => u.uid !== user?.uid)
+                .filter(u => u.uid !== owner)
                 .filter(u => !sharedWith.includes(u.uid));
             setUsers(filteredUsers.slice(0, 15));
         });
 
-        const unsubscribe2 = watchSharedWith(id as string, (sharedWith) => {
-            setSharedWith(sharedWith);
-        });
-
         return () => {
             unsubscribe();
-            unsubscribe2();
         };
     }, [users, id, sharedWith]);
 
@@ -79,113 +78,75 @@ export default function EditBudgetBookPage() {
     };
 
     const handleOnClick = () => {
-        if(selectedUser) {
+        if (selectedUser) {
             shareBudgetBook(id as string, selectedUser.email)
         }
         setSelectedUser(null);
-    } 
+    }
 
     return (
-        <main className="p-24">
-            <h1 className="text-3xl font-bold underline">Edit the Budget Book</h1>
+        <main className="p-20">
+            <div className="mb-8">
+                <h1 className="text-2xl font-medium tracking-tight text-gray-900">Edit budget book</h1>
+                <p className="text-xs font-mono text-gray-400 mt-1">{name}</p>
+            </div>
 
-            <form onSubmit={onSubmit} className="flex flex-col gap-4 mt-4">
-                <h2 className="text-2xl font-bold">Information</h2>
-                <strong>Budget Book Name</strong>
-                <input
-                    type="text"
-                    placeholder="Name"
-                    className="border p-2 rounded"
-                    required
-                    maxLength={50}
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                />
-                <em>Max 50 characters</em>
-                <strong>Description</strong>
-                <textarea
-                    placeholder="Description"
-                    className="border p-2 rounded"
-                    value={description}
-                    maxLength={500}
-                    onChange={(e) => setDescription(e.target.value)}
-                />
-                <em>Max 500 characters</em>
-                <div className="flex justify-between">
-                    <button
-                        type="button"
-                        onClick={() => setShowModal(true)}
-                        className="bg-gray-900 text-white p-2 rounded hover:bg-gray-500"
-                    >
-                        Archive
-                    </button>
-                    <div className="flex gap-5">
-                        <button
-                            type="button"
-                            onClick={() => router.push(`/budgetbook/${id}`)}
-                            className={btn.secondary}
-                        >
-                            Cancel
-                        </button>
-
-                        <button
-                            type="submit"
-                            className={btn.primary}
-                        >
-                            Save
-                        </button>
+            <section className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+                <p className="text-[11px] font-mono tracking-widest text-gray-400 uppercase mb-5">Information</p>
+                <form onSubmit={onSubmit} className="flex flex-col gap-5">
+                    <div>
+                        <label className="block text-xs font-mono text-gray-500 mb-1.5" htmlFor="name">Name</label>
+                        <input id="name" type="text" placeholder="Name" required maxLength={50}
+                            className="w-full bg-gray-50 border border-gray-200 rounded-md px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-black/5"
+                            value={name} onChange={(e) => setName(e.target.value)} />
+                        <p className="text-[11px] font-mono text-gray-400 mt-1">Max 50 characters</p>
                     </div>
-                </div>
-            </form>
-
-            <hr className="my-8" />
-
-            <div className="border rounded p-4">
-                <h2 className="text-xl font-bold mb-4">Share Budget Book</h2>
-
-                <div className="flex gap-2">
-                    <div className="relative space-y-2 flex-1">
-                        <SearchableDropdown array={users} onClick={setSelectedUser} />
-                        
-                        <div className="flex items-center gap-2">
-                            {selectedUser && (
-                                <div className="flex items-center gap-2 border-2 p-2 rounded shadow-lg">
-                                    <span>{selectedUser.email}</span>
-                                    <button onClick={() => setSelectedUser(null)} className="font-bold text-red-500 hover:text-red-700">&times;</button>
-                                </div>
-                            )}
+                    <div>
+                        <label className="block text-xs font-mono text-gray-500 mb-1.5" htmlFor="desc">Description</label>
+                        <textarea id="desc" placeholder="Description" rows={3} maxLength={500}
+                            className="w-full bg-gray-50 border border-gray-200 rounded-md px-3 py-2.5 text-sm text-gray-900 resize-none focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-black/5"
+                            value={description} onChange={(e) => setDescription(e.target.value)} />
+                        <p className="text-[11px] font-mono text-gray-400 mt-1">Max 500 characters</p>
+                    </div>
+                    <div className="flex items-center justify-between pt-1">
+                        <button type="button" onClick={() => setShowModal(true)} className={btn.danger}>
+                            Archive
+                        </button>
+                        <div className="flex gap-2">
+                            <button type="button" onClick={() => router.push(`/budgetbook/${id}`)} className={btn.secondary}>Cancel</button>
+                            <button type="submit" className={btn.primary}>Save changes</button>
                         </div>
                     </div>
+                </form>
+            </section>
 
-                    <button
-                        className={`${btn.primary} h-fit`}
-                        onClick={handleOnClick}
-                        disabled={!selectedUser}
-                    >
+            <section className="bg-white border border-gray-200 rounded-xl p-6">
+                <p className="text-[11px] font-mono tracking-widest text-gray-400 uppercase mb-5">Share with others</p>
+                <div className="flex gap-2 items-start">
+                    <div className="flex-1 space-y-2">
+                        <SearchableDropdown array={users} onClick={setSelectedUser} />
+                        {selectedUser && (
+                            <div className="inline-flex items-center gap-2 bg-gray-100 border border-gray-200 rounded-full px-3 py-1 text-xs font-mono text-gray-700">
+                                {selectedUser.email}
+                                <button onClick={() => setSelectedUser(null)} className="text-gray-400 hover:text-red-600 font-bold leading-none">&times;</button>
+                            </div>
+                        )}
+                    </div>
+                    <button onClick={handleOnClick} disabled={!selectedUser} className={`${btn.success} disabled:opacity-40 disabled:cursor-not-allowed`}>
                         Invite
                     </button>
                 </div>
-            </div>
+            </section>
 
             {showModal && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-                    <div className="bg-white p-6 rounded shadow flex flex-col gap-4">
-                        <p>Are you sure you want to archive this budget book?</p>
-
-                        <div className="flex gap-3 justify-between">
-                            <button
-                                onClick={() => setShowModal(false)}
-                                className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
-                            >
-                                Cancel
-                            </button>
-
-                            <button
-                                onClick={handleArchive}
-                                className={btn.secondary}
-                            >
-                                Yes, archive
-                            </button>
+                <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+                    <div className="bg-white rounded-xl border border-gray-200 p-6 max-w-sm w-full mx-4 flex flex-col gap-4">
+                        <p className="text-sm text-gray-700 leading-relaxed">
+                            Archive <strong>{name}</strong>? It will be hidden from your active books and can be restored later.
+                        </p>
+                        <div className="flex gap-2 justify-between">
+                            <button onClick={() => setShowModal(false)} className={btn.secondary}>Cancel</button>
+                            <button onClick={handleArchive} className={btn.danger}>Yes, archive</button>
                         </div>
                     </div>
                 </div>
