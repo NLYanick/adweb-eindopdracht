@@ -57,11 +57,7 @@ export default function BudgetBookDetailPage() {
         const timer = setTimeout(() => {
             setDebouncedMonth(month);
             setDebouncedYear(year);
-<<<<<<< HEAD
-        }, 300);
-=======
         }, 200);
->>>>>>> invites
         return () => clearTimeout(timer);
     }, [month, year]);
 
@@ -137,19 +133,6 @@ export default function BudgetBookDetailPage() {
 
             <hr />
 
-<<<<<<< HEAD
-            <AddTransaction id={id} className="flex my-3 justify-end" />
-            {editingTransaction && (
-                <EditTransaction
-                    transaction={editingTransaction}
-                    onClose={() => setEditingTransaction(null)}
-                />
-            )}
-
-            {transactions.toSorted((a, b) => new Date(b.date).getDay() - new Date(a.date).getDay()).map((t) => (
-                <TransactionRow key={t.uid} transaction={t} onEdit={setEditingTransaction} />
-            ))}
-=======
             <div className="flex border-b mb-4">
                 <button
                     onClick={() => setTab("transactions")}
@@ -173,7 +156,6 @@ export default function BudgetBookDetailPage() {
 
             {tab === "transactions" && <TransactionPanel budgetbookId={id} month={month} year={year} />}
             {/* {tab === "categories" && <CategoryPanel budgetbookId={id} month={month} year={year} />} */}
->>>>>>> invites
         </div>
     )
 }
