@@ -88,8 +88,6 @@ export default function BudgetBookDetailPage() {
     const income = transactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
     const expenses = transactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0);
 
-    console.log(editingTransaction)
-
     return (
         <div className="m-9">
 
