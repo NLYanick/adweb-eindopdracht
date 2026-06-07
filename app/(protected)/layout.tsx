@@ -4,6 +4,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Link from "next/link";
+import { btn } from "../lib/button";
 
 export default function ProtectedLayout({
     children,
@@ -48,18 +49,18 @@ export default function ProtectedLayout({
                 <div className="flex gap-6">
                     <Link
                         href="/"
-                        className="text-sm font-medium text-gray-700 hover:text-black transition-colors"
+                        className="text-sm font-mono tracking-widest text-gray-500 uppercase hover:text-black transition-colors"
                     >
                         Home
                     </Link>
                     <Link
                         href="/budgetbook"
-                        className="text-sm font-medium text-gray-700 hover:text-black transition-colors"
+                        className="text-sm font-mono tracking-widest text-gray-500 uppercase hover:text-black transition-colors"
                     >
                         Budget Books
                     </Link>
                 </div>
-                <button onClick={logout} className="bg-red-500 text-white p-2 rounded hover:bg-red-600">
+                <button onClick={logout} className={btn.danger}>
                     Log out
                 </button>
             </nav>

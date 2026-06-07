@@ -4,7 +4,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import { getBudgetBook } from "@/app/services/budgetbook-service";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { watchTransactions, watchTransactionsByMonth } from "@/app/services/transaction-service";
 import { Transaction } from "@/app/lib/schemas";
@@ -14,6 +14,7 @@ import EditTransaction from "@/app/components/EditTransaction";
 import TransactionsPanel from "@/app/components/TransactionsPanel";
 import TransactionPanel from "@/app/components/TransactionsPanel";
 import CategoryList from "@/app/components/CategoryList";
+import { btn } from "@/app/lib/button";
 
 export default function BudgetBookDetailPage() {
     const { id } = useParams<{ id: string }>();
@@ -22,6 +23,7 @@ export default function BudgetBookDetailPage() {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const { user } = useAuth();
+    const router = useRouter();
 
     const now = new Date();
     const [month, setMonth] = useState(now.getMonth() + 1);
@@ -44,7 +46,7 @@ export default function BudgetBookDetailPage() {
                 return;
             }
 
-            if (data.owner !== user?.uid) {
+            if (data.owner !== user?.uid && !data.sharedWith?.includes(user.uid)) {
                 router.push("/budgetbook");
                 return;
             }
@@ -89,8 +91,6 @@ export default function BudgetBookDetailPage() {
     const income = transactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
     const expenses = transactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0);
 
-    console.log(editingTransaction)
-
     return (
         <div className="m-9">
 
@@ -101,7 +101,7 @@ export default function BudgetBookDetailPage() {
                 </div>
                 <Link
                     href={`/budgetbook/${id}/edit`}
-                    className="h-fit px-3 py-1 bg-green-500 text-white rounded hover:bg-green-400 align-middle"
+                    className={`${btn.success} h-fit`}
                 >
                     Edit
                 </Link>
@@ -121,7 +121,7 @@ export default function BudgetBookDetailPage() {
 
                 {/* Income */}
                 <div className="bg-green-100 rounded-xl p-4 text-center font-semibold">
-                    <p className="text-sm text-green-700">Income</p>
+                    <p className="text-sm text-green-800">Income</p>
                     <p className="text-lg text-green-900">€{income}</p>
                 </div>
 
