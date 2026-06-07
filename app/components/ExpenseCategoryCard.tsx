@@ -16,18 +16,18 @@ export default function ExpenseCategoryCard({
 }: ExpenseCategoryCardProps) {
   const expenses = transactions
     .filter((t) => t.amount < 0 && t.category === category.uid)
-    .reduce((sum, t) => sum + t.amount, 0);
+    .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
   const income = transactions
     .filter((t) => t.amount > 0 && t.category === category.uid)
-    .reduce((sum, t) => sum + t.amount, 0);
+    .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
   const effectiveBudget = category.budget + income;
   const remaining = effectiveBudget - expenses;
-  const percentage = Math.min((expenses / effectiveBudget) * 100, 100);
+  const percentage = Math.round((expenses / effectiveBudget) * 100);
 
   const status =
-    percentage >= 100 ? "over" : percentage >= 80 ? "almost" : "ok";
+    percentage > 100 ? "over": percentage > 95 ? "maxed" : percentage >= 80 ? "almost" : "ok";
 
   const statusStyles = {
     ok: {
@@ -40,8 +40,13 @@ export default function ExpenseCategoryCard({
       label: "Almost",
       bar: "bg-yellow-400",
     },
-    over: {
+    maxed: {
       badge: "bg-red-100 text-red-800",
+      label: "Max",
+      bar: "bg-yellow-400",
+    },
+    over: {
+      badge: "bg-red-400 text-red-900",
       label: "Over",
       bar: "bg-red-500",
     },

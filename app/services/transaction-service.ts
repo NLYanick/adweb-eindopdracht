@@ -67,6 +67,7 @@ export async function createTransaction(transaction: Omit<Transaction, "uid">) {
     try {
         await addDoc(collection(db, "transactions"), {
             ...transaction,
+            category: transaction.category && transaction.category.length > 0 ? transaction.category : null,
         });
     } catch (e) {
         console.error("Error creating transaction:", e);

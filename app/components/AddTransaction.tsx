@@ -1,9 +1,9 @@
 "use client";
 
 import { createTransaction } from "@/app/services/transaction-service";
-import { useParams } from "next/navigation";
 import { useState } from "react";
 import { btn } from "../lib/button";
+import { useCategoriesForMonth } from "../hooks/useCategoriesByMonth";
 type Props = {
     id: string;
     className?: string;
@@ -14,14 +14,27 @@ export default function AddTransaction({ id, className }: Props) {
     const today = new Date().toISOString().split("T")[0];
     const [type, setType] = useState<"expense" | "income">("income");
     const [amount, setAmount] = useState("");
+    const [categoryId, setCategoryId] = useState("");
     const [description, setDescription] = useState("");
     const [date, setDate] = useState(today);
+
+    const allCategories = useCategoriesForMonth(
+        id,
+        parseInt(date.split("-")[0]),
+        parseInt(date.split("-")[1])
+    );
+
+    const validCategories = allCategories.filter(c =>
+        c.type === type &&
+        (!c.endDate || c.endDate >= date)
+    );
 
     const onSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
 
         await createTransaction({
             budgetbook: id,
+            category: categoryId,
             amount: type === "expense" ? -parseFloat(amount) : parseFloat(amount),
             description,
             date,
@@ -32,6 +45,7 @@ export default function AddTransaction({ id, className }: Props) {
         setDescription("");
         setDate(today);
         setType("expense");
+        setCategoryId("");
     };
 
     return (
@@ -52,7 +66,7 @@ export default function AddTransaction({ id, className }: Props) {
                             <div className="flex rounded overflow-hidden border w-full">
                                 <button
                                     type="button"
-                                    onClick={() => setType("expense")}
+                                    onClick={() => {setType("expense"); setCategoryId("")}}
                                     className={`px-6 py-2 text-sm font-medium transition-colors w-1/2 ${type === "expense"
                                         ? btn.danger
                                         : btn.clear
@@ -62,7 +76,7 @@ export default function AddTransaction({ id, className }: Props) {
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => setType("income")}
+                                    onClick={() => {setType("income"); setCategoryId("")}}
                                     className={`px-6 py-2 text-sm font-medium transition-colors w-1/2 ${type === "income"
                                         ? btn.success
                                         : btn.clear
@@ -71,6 +85,16 @@ export default function AddTransaction({ id, className }: Props) {
                                     Income
                                 </button>
                             </div>
+                            <select
+                                className="border p-2 rounded"
+                                value={categoryId}
+                                onChange={(e) => setCategoryId(e.target.value)}
+                            >
+                                <option value="">No category</option>
+                                {validCategories.map(c => (
+                                    <option key={c.uid} value={c.uid}>{c.name}</option>
+                                ))}
+                            </select>
                             <div className="flex items-center">
                                 <label className="flex text-3xl w-1/8 justify-center">{type === "expense" && "-" || "+"}</label>
                                 <input
