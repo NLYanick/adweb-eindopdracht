@@ -23,10 +23,16 @@ export type Transaction = {
   category?: string; // category uid
 }
 
+export enum CategoryType {
+    Income = "income",
+    Expense = "expense",
+}
+
 export type Category = {
-  uid: string;
-  budgetbook: string;
-  name: string;
-  budget: number;
-  endDate?: string;
+    uid: string;
+    budgetbook: string;
+    type: CategoryType;
+    name: string;
+    budget: number;
+    endDate?: string;
 }

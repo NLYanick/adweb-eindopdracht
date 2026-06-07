@@ -13,6 +13,7 @@ import TransactionRow from "@/app/components/TransactionRow";
 import EditTransaction from "@/app/components/EditTransaction";
 import TransactionsPanel from "@/app/components/TransactionsPanel";
 import TransactionPanel from "@/app/components/TransactionsPanel";
+import CategoryList from "@/app/components/CategoryList";
 
 export default function BudgetBookDetailPage() {
     const { id } = useParams<{ id: string }>();
@@ -155,7 +156,7 @@ export default function BudgetBookDetailPage() {
             </div>
 
             {tab === "transactions" && <TransactionPanel budgetbookId={id} month={month} year={year} />}
-            {/* {tab === "categories" && <CategoryPanel budgetbookId={id} month={month} year={year} />} */}
+            {tab === "categories" && <CategoryList budgetbookId={id} month={month} year={year} />}
         </div>
     )
 }

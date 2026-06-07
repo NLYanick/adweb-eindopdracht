@@ -3,15 +3,15 @@ import { Category, Transaction } from "../lib/schemas";
 interface IncomeCategoryCardProps {
   category: Category;
   transactions: Transaction[];
-  onEdit: (category: Category) => void;
-  onDelete: (categoryId: string) => void;
+  // onEdit: (category: Category) => void;
+  // onDelete: (categoryId: string) => void;
 }
 
 export default function IncomeCategoryCard({
   category,
   transactions,
-  onEdit,
-  onDelete,
+  // onEdit,
+  // onDelete,
 }: IncomeCategoryCardProps) {
   const totalIncome = transactions
     .filter((t) => t.amount > 0 && t.category === category.uid)
@@ -47,7 +47,7 @@ export default function IncomeCategoryCard({
         </p>
       </div>
 
-      <div className="flex gap-2 justify-end">
+      {/* <div className="flex gap-2 justify-end">
         <button
           onClick={() => onEdit(category)}
           className="text-xs px-3 py-1 border border-gray-200 rounded-md hover:bg-gray-50 transition"
@@ -60,7 +60,7 @@ export default function IncomeCategoryCard({
         >
           Delete
         </button>
-      </div>
+      </div> */}
     </div>
   );
 }

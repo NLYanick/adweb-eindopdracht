@@ -1,5 +1,3 @@
-// useTransactionsByMonth.ts
-
 import { useEffect, useState } from "react";
 import { watchTransactionsByMonth } from "../services/transaction-service";
 import { Transaction } from "../lib/schemas";

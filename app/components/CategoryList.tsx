@@ -1,5 +1,8 @@
+import { useCategoriesForMonth } from "../hooks/useCategoriesByMonth";
 import { useTransactionsByMonth } from "../hooks/useTransactionsByMonth";
-import { Category } from "../lib/schemas";
+import { btn } from "../lib/button";
+import { Category, CategoryType } from "../lib/schemas";
+import AddCategory from "./AddCategory";
 import ExpenseCategoryCard from "./ExpenseCategoryCard";
 import IncomeCategoryCard from "./IncomeCategoryCard";
 
@@ -20,66 +23,68 @@ export default function CategoryList({
     month
   );
 
-  const categories = useTransactionsByMonth(
+  const categories = useCategoriesForMonth(
     budgetbookId,
     year,
     month
   );
+  let addButton = <div className="flex justify-end" ><AddCategory className={btn.primary} budgetbookId={budgetbookId} ></AddCategory></div>
 
   if (categories.length === 0) {
     return (
-      <p className="text-sm text-gray-400 text-center py-8">
-        No categories yet. Add one to get started.
-      </p>
+      <>
+        {addButton}
+        <p className="text-sm text-gray-400 text-center py-8">
+          No categories yet. Add one to get started.
+        </p>
+      </>
     );
   }
 
-  const expenseCategories = categories.filter((c) => c.type === "expense");
-  const incomeCategories = categories.filter((c) => c.type === "income");
+  const expenseCategories = categories.filter((c) => c.type == CategoryType.Expense);
+  const incomeCategories = categories.filter((c) => c.type == CategoryType.Income);
 
   // transactions per category — passed down so cards don't fetch individually
-  const transactionsForCategory = (category: string) =>
-    transactions.filter((t) => t.category === categoryId);
-
+  const transactionsForCategory = (category: Category) =>
+    transactions.filter((t) => t.category === category.uid);
   return (
-    <div className="flex flex-col gap-6">
-      {incomeCategories.length > 0 && (
-        <div>
-          <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
-            Income
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {incomeCategories.map((category) => (
-              <IncomeCategoryCard
-                key={category.id}
-                category={category}
-                transactions={transactionsForCategory(category.id)}
-                onEdit={onEdit}
-                onDelete={onDelete}
-              />
-            ))}
+    <>
+      {addButton}
+      <div className="flex flex-col gap-6">
+        {incomeCategories.length > 0 && (
+          <div>
+            <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
+              Income
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {incomeCategories.map((category) => (
+                <IncomeCategoryCard
+                  key={category.uid}
+                  category={category}
+                  transactions={transactionsForCategory(category)}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {expenseCategories.length > 0 && (
-        <div>
-          <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
-            Expenses
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {expenseCategories.map((category) => (
-              <ExpenseCategoryCard
-                key={category.id}
-                category={category}
-                transactions={transactionsForCategory(category.id)}
-                onEdit={onEdit}
-                onDelete={onDelete}
-              />
-            ))}
+        {expenseCategories.length > 0 && (
+          <div>
+            <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
+              Expenses
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {expenseCategories.map((category) => (
+                <ExpenseCategoryCard
+                  key={category.uid}
+                  category={category}
+                  transactions={transactionsForCategory(category)}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 }
