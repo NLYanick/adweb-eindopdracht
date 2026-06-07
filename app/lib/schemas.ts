@@ -20,7 +20,7 @@ export type Transaction = {
   amount: number; // negative = expense, positive = income
   description?: string;
   date: string;
-  category?: string; // category uid
+  category?: string | null;// category uid
 }
 
 export enum CategoryType {

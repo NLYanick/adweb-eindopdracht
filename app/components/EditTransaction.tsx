@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Transaction } from "../lib/schemas";
 import { deleteTransaction, updateTransaction } from "../services/transaction-service";
+import { useCategoriesForMonth } from "../hooks/useCategoriesByMonth";
 import { btn } from "../lib/button";
 
 type Props = {
@@ -16,14 +17,27 @@ export default function EditTransaction({ transaction, onClose }: Props) {
     const [amount, setAmount] = useState(Math.abs(transaction.amount).toString());
     const [description, setDescription] = useState(transaction.description ?? "");
     const [date, setDate] = useState(transaction.date);
+    const [categoryId, setCategoryId] = useState(transaction.category ?? "");
 
-    const onSubmit = async (e: React.SubmitEvent) => {
+    const allCategories = useCategoriesForMonth(
+        transaction.budgetbook,
+        parseInt(date.split("-")[0]),
+        parseInt(date.split("-")[1])
+    );
+
+    const validCategories = allCategories.filter(c =>
+        c.type === type &&
+        (!c.endDate || c.endDate >= date)
+    );
+
+    const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         await updateTransaction(transaction.uid, {
             budgetbook: transaction.budgetbook,
             amount: type === "expense" ? -parseFloat(amount) : parseFloat(amount),
             description,
             date,
+            category: categoryId && categoryId.length > 0 ? categoryId : null,
         });
         onClose();
     };
@@ -37,33 +51,39 @@ export default function EditTransaction({ transaction, onClose }: Props) {
         <div>
             <div onClick={() => onClose()} className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
                 <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-lg p-6 w-full max-w-md flex flex-col gap-4">
-                    <h2 className="text-xl font-bold">Add Transaction</h2>
+                    <h2 className="text-xl font-bold">Edit Transaction</h2>
 
                     <form onSubmit={onSubmit} className="flex flex-col gap-4">
                         <div className="flex rounded overflow-hidden border w-full">
                             <button
                                 type="button"
-                                onClick={() => setType("expense")}
-                                className={`px-6 py-2 text-sm font-medium transition-colors w-1/2 ${type === "expense"
-                                    ? btn.danger
-                                    : btn.clear
-                                    }`}
+                                onClick={() => { setType("expense"); setCategoryId(""); }}
+                                className={`px-6 py-2 text-sm font-medium transition-colors w-1/2 ${type === "expense" ? btn.danger : btn.clear}`}
                             >
                                 Expense
                             </button>
                             <button
                                 type="button"
-                                onClick={() => setType("income")}
-                                className={`px-6 py-2 text-sm font-medium transition-colors w-1/2 ${type === "income"
-                                    ? btn.success
-                                    : btn.clear
-                                    }`}
+                                onClick={() => { setType("income"); setCategoryId(""); }}
+                                className={`px-6 py-2 text-sm font-medium transition-colors w-1/2 ${type === "income" ? btn.success : btn.clear}`}
                             >
                                 Income
                             </button>
                         </div>
+
+                        <select
+                            className="border p-2 rounded"
+                            value={categoryId}
+                            onChange={(e) => setCategoryId(e.target.value)}
+                        >
+                            <option value="">No category</option>
+                            {validCategories.map(c => (
+                                <option key={c.uid} value={c.uid}>{c.name}</option>
+                            ))}
+                        </select>
+
                         <div className="flex items-center">
-                            <label className="flex text-3xl w-1/8 justify-center">{type === "expense" && "-" || "+"}</label>
+                            <label className="flex text-3xl w-1/8 justify-center">{type === "expense" ? "-" : "+"}</label>
                             <input
                                 type="number"
                                 placeholder="Amount"
@@ -97,8 +117,10 @@ export default function EditTransaction({ transaction, onClose }: Props) {
                                 type="button"
                                 onClick={() => setShowDelete(true)}
                                 className={btn.danger}
-                            > Delete </button>
-                            <div>
+                            >
+                                Delete
+                            </button>
+                            <div className="flex gap-2">
                                 <button
                                     type="button"
                                     onClick={() => onClose()}
@@ -110,13 +132,14 @@ export default function EditTransaction({ transaction, onClose }: Props) {
                                     type="submit"
                                     className={btn.primary}
                                 >
-                                    Add
+                                    Save
                                 </button>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
+
             {showDelete && (
                 <div
                     className="fixed inset-0 bg-black/60 flex items-center justify-center z-60"
@@ -148,5 +171,5 @@ export default function EditTransaction({ transaction, onClose }: Props) {
                 </div>
             )}
         </div>
-    )
+    );
 }
