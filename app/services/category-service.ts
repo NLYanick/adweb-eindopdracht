@@ -1,4 +1,4 @@
-import { addDoc, collection, onSnapshot, query, where } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, onSnapshot, query, updateDoc, where } from "firebase/firestore";
 import { Category } from "../lib/schemas";
 import { db } from "../lib/firebase";
 
@@ -9,35 +9,18 @@ export function watchCategoriesForMonth(
 ) {
     if (!budgetbookId) return () => {};
 
-    const results: { [id: string]: Category } = {};
-
-    const q1 = query(
+    const q = query(
         collection(db, "categories"),
         where("budgetbook", "==", budgetbookId),
-        where("endDate", "==", null)
     );
 
-    const q2 = query(
-        collection(db, "categories"),
-        where("budgetbook", "==", budgetbookId),
-        where("endDate", ">=", monthStart)
-    );
+    return onSnapshot(q, (snapshot) => {
+        const categories: Category[] = snapshot.docs
+            .map(d => ({ uid: d.id, ...(d.data() as Omit<Category, "uid">) }))
+            .filter(c => !c.endDate || c.endDate >= monthStart);
 
-    const unsub1 = onSnapshot(q1, (snapshot) => {
-        snapshot.docs.forEach(d => {
-            results[d.id] = { uid: d.id, ...(d.data() as Omit<Category, "uid">) };
-        });
-        callback(Object.values(results));
+        callback(categories);
     });
-
-    const unsub2 = onSnapshot(q2, (snapshot) => {
-        snapshot.docs.forEach(d => {
-            results[d.id] = { uid: d.id, ...(d.data() as Omit<Category, "uid">) };
-        });
-        callback(Object.values(results));
-    });
-
-    return () => { unsub1(); unsub2(); };
 }
 
 export async function createCategory(category: Omit<Category, "uid">) {
@@ -50,3 +33,16 @@ export async function createCategory(category: Omit<Category, "uid">) {
         console.error("Error creating category:", e);
     }
 }
+
+export const updateCategory = async (
+    uid: string,
+    data: Omit<Category, "uid">
+) => {
+    const docRef = doc(db, "categories", uid);
+    await updateDoc(docRef, { ...data, endDate: data.endDate ?? null, });
+};
+
+export const deleteCategory = async (uid: string) => {
+    const docRef = doc(db, "categories", uid);
+    await deleteDoc(docRef);
+};

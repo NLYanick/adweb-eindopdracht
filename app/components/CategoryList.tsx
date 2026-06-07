@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useCategoriesForMonth } from "../hooks/useCategoriesByMonth";
 import { useTransactionsByMonth } from "../hooks/useTransactionsByMonth";
 import { btn } from "../lib/button";
@@ -5,6 +6,7 @@ import { Category, CategoryType } from "../lib/schemas";
 import AddCategory from "./AddCategory";
 import ExpenseCategoryCard from "./ExpenseCategoryCard";
 import IncomeCategoryCard from "./IncomeCategoryCard";
+import EditCategory from "./EditCategory";
 
 interface CategoryListProps {
   budgetbookId: string;
@@ -17,6 +19,9 @@ export default function CategoryList({
   year,
   month,
 }: CategoryListProps) {
+
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+
   const transactions = useTransactionsByMonth(
     budgetbookId,
     year,
@@ -62,7 +67,7 @@ export default function CategoryList({
                   key={category.uid}
                   category={category}
                   transactions={transactionsForCategory(category)}
-                />
+                  onEdit={setEditingCategory} />
               ))}
             </div>
           </div>
@@ -79,12 +84,20 @@ export default function CategoryList({
                   key={category.uid}
                   category={category}
                   transactions={transactionsForCategory(category)}
-                />
+                  onEdit={setEditingCategory} />
               ))}
             </div>
           </div>
         )}
       </div>
+      {
+        editingCategory && (
+          <EditCategory
+            category={editingCategory}
+            onClose={() => setEditingCategory(null)}
+          />
+        )
+      }
     </>
   );
 }

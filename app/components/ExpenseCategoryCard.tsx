@@ -4,15 +4,13 @@ import { Category, Transaction } from "../lib/schemas";
 interface ExpenseCategoryCardProps {
   category: Category;
   transactions: Transaction[];
-  // onEdit: (category: Category) => void;
-  // onDelete: (categoryId: string) => void;
+  onEdit: (category: Category) => void;
 }
 
 export default function ExpenseCategoryCard({
   category,
   transactions,
-  // onEdit,
-  // onDelete,
+  onEdit,
 }: ExpenseCategoryCardProps) {
   const expenses = transactions
     .filter((t) => t.amount < 0 && t.category === category.uid)
@@ -95,20 +93,14 @@ export default function ExpenseCategoryCard({
         <p className="text-xs text-red-500">€{Math.abs(remaining).toFixed(2)} over budget</p>
       )}
 
-      {/* <div className="flex gap-2 justify-end">
+      <div className="flex gap-2 justify-end">
         <button
           onClick={() => onEdit(category)}
           className="text-xs px-3 py-1 border border-gray-200 rounded-md hover:bg-gray-50 transition"
         >
           Edit
         </button>
-        <button
-          onClick={() => onDelete(category.uid)}
-          className="text-xs px-3 py-1 border border-red-200 text-red-500 rounded-md hover:bg-red-50 transition"
-        >
-          Delete
-        </button>
-      </div> */}
+      </div>
     </div>
   );
 }
