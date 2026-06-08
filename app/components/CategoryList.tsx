@@ -33,7 +33,7 @@ export default function CategoryList({
     year,
     month
   );
-  let addButton = <div className="flex justify-end" ><AddCategory className={btn.primary} budgetbookId={budgetbookId} ></AddCategory></div>
+  let addButton = <div className="flex justify-end" ><AddCategory budgetbookId={budgetbookId} ></AddCategory></div>
 
   if (categories.length === 0) {
     return (
@@ -49,7 +49,6 @@ export default function CategoryList({
   const expenseCategories = categories.filter((c) => c.type == CategoryType.Expense);
   const incomeCategories = categories.filter((c) => c.type == CategoryType.Income);
 
-  // transactions per category — passed down so cards don't fetch individually
   const transactionsForCategory = (category: Category) =>
     transactions.filter((t) => t.category === category.uid);
   return (

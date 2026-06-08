@@ -21,11 +21,13 @@ export default function AddCategory({ budgetbookId, className }: Props) {
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        console.log(parseFloat(budget || ""))
+
         await createCategory({
             budgetbook: budgetbookId,
             type,
             name,
-            budget: parseFloat(budget),
+            budget: parseFloat(budget || ""),
             endDate: endDate || undefined,
         });
 
@@ -79,19 +81,18 @@ export default function AddCategory({ budgetbookId, className }: Props) {
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                             />
-                            {type == CategoryType.Expense &&
-                                <input
-                                    type="number"
-                                    placeholder="Budget"
-                                    className="border p-2 rounded"
-                                    required
-                                    min="0.01"
-                                    step="0.01"
-                                    value={budget}
-                                    onChange={(e) => setBudget(e.target.value)}
-                                />
-                            }
 
+                            <input
+                                type="number"
+                                placeholder={`Budget ${type === CategoryType.Income ? "(Optional)" : ""}`}
+                                className="border p-2 rounded"
+                                required={type === CategoryType.Expense}
+                                min="0.01"
+                                step="0.01"
+                                value={budget}
+                                onChange={(e) => setBudget(e.target.value)}
+                            />
+                            
                             <div className="flex flex-col gap-1">
                                 <label className="text-sm text-gray-500">End date (optional)</label>
                                 <input

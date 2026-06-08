@@ -10,7 +10,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 type AuthContextType = {
   user: UserProfile | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<boolean>;
 };
@@ -43,13 +43,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   async function login(email: string, password: string) {
-    const result = await signInWithEmailAndPassword(auth, email, password);
+    const { user } = await signInWithEmailAndPassword(auth, email, password);
     
+    if(!user) return false;
+
     setUser({
-      uid: result.user.uid,
-      email: result.user.email || "",
-      name: result.user.displayName || ""
+      uid: user.uid,
+      email: user.email || "",
+      name: user.displayName || ""
     });
+
+    return true;
   }
 
   async function logout() {
