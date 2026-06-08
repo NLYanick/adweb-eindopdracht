@@ -1,14 +1,15 @@
 "use client";
 
 import { createTransaction } from "@/app/services/transaction-service";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { btn } from "../lib/button";
 import { useCategoriesForMonth } from "../hooks/useCategoriesByMonth";
 type Props = {
     id: string;
     className?: string;
+    ref?: React.Ref<HTMLButtonElement>;
 };
-export default function AddTransaction({ id, className }: Props) {
+export default function AddTransaction({ id, className, ref }: Props) {
     const [show, setShow] = useState(false);
 
     const today = new Date().toISOString().split("T")[0];
@@ -17,6 +18,14 @@ export default function AddTransaction({ id, className }: Props) {
     const [categoryId, setCategoryId] = useState("");
     const [description, setDescription] = useState("");
     const [date, setDate] = useState(today);
+
+    const typeRef = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        if (show) {
+            typeRef.current?.focus();
+        }
+    }, [show]);
 
     const allCategories = useCategoriesForMonth(
         id,
@@ -51,6 +60,7 @@ export default function AddTransaction({ id, className }: Props) {
     return (
         <div className={className ?? ""} onClick={() => setShow(false)}>
             <button
+                ref={ref}
                 onClick={(e) => { setShow(true); e.stopPropagation() }}
                 className={btn.primary}
             >
@@ -65,6 +75,7 @@ export default function AddTransaction({ id, className }: Props) {
                         <form onSubmit={onSubmit} className="flex flex-col gap-4">
                             <div className="flex rounded overflow-hidden border w-full">
                                 <button
+                                    ref={typeRef}
                                     type="button"
                                     onClick={() => {setType("expense"); setCategoryId("")}}
                                     className={`px-6 py-2 text-sm font-medium transition-colors w-1/2 ${type === "expense"
@@ -96,8 +107,11 @@ export default function AddTransaction({ id, className }: Props) {
                                 ))}
                             </select>
                             <div className="flex items-center">
-                                <label className="flex text-3xl w-1/8 justify-center">{type === "expense" && "-" || "+"}</label>
+                                <label className="flex text-3xl w-1/8 justify-center" htmlFor="amount">
+                                    {type === "expense" && "-" || "+"}
+                                </label>
                                 <input
+                                    id="amount"
                                     type="number"
                                     placeholder="Amount"
                                     className="border p-2 rounded w-7/8"

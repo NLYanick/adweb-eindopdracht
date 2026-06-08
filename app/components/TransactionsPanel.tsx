@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AddTransaction from "./AddTransaction";
 import { Transaction } from "../lib/schemas";
 import TransactionRow from "./TransactionRow";
@@ -18,6 +18,17 @@ export default function TransactionPanel({ budgetbookId, month, year }: Props) {
   const categories = useCategoriesForMonth(budgetbookId, year, month);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
 
+  const typeRef = useRef<HTMLButtonElement>(null);
+  const returnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+      if (editingTransaction) {
+          typeRef.current?.focus();
+      } else {
+          returnRef.current?.focus();
+      }
+  }, [editingTransaction]);
+
   const sorted = transactions.toSorted(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
@@ -25,7 +36,7 @@ export default function TransactionPanel({ budgetbookId, month, year }: Props) {
   return (
     <div>
       <div className="flex justify-end mb-4">
-        <AddTransaction id={budgetbookId} />
+        <AddTransaction id={budgetbookId} ref={returnRef} />
       </div>
 
       <p className="font-mono text-[11px] text-gray-400 mb-3">
@@ -46,6 +57,7 @@ export default function TransactionPanel({ budgetbookId, month, year }: Props) {
         <EditTransaction
           transaction={editingTransaction}
           onClose={() => setEditingTransaction(null)}
+          ref={typeRef}
         />
       )}
     </div>

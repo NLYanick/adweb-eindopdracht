@@ -1,22 +1,31 @@
 "use client";
 
 import { createCategory } from "@/app/services/category-service";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { btn } from "../lib/button";
 import { CategoryType } from "../lib/schemas";
 
 type Props = {
     budgetbookId: string;
     className?: string;
+    ref?: React.Ref<HTMLButtonElement>;
 };
 
-export default function AddCategory({ budgetbookId, className }: Props) {
+export default function AddCategory({ budgetbookId, className, ref }: Props) {
     const [show, setShow] = useState(false);
 
     const [type, setType] = useState<CategoryType>(CategoryType.Expense);
     const [name, setName] = useState("");
     const [budget, setBudget] = useState("");
     const [endDate, setEndDate] = useState("");
+
+    const typeRef = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        if (show) {
+            typeRef.current?.focus();
+        }
+    }, [show]);
 
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -39,6 +48,7 @@ export default function AddCategory({ budgetbookId, className }: Props) {
     return (
         <div className={className ?? ""}>
             <button
+                ref={ref}
                 onClick={() => setShow(true)}
                 className={btn.primary}
             >
@@ -53,6 +63,7 @@ export default function AddCategory({ budgetbookId, className }: Props) {
                         <form onSubmit={onSubmit} className="flex flex-col gap-4">
                             <div className="flex rounded overflow-hidden border w-full">
                                 <button
+                                    ref={typeRef}
                                     type="button"
                                     onClick={() => setType(CategoryType.Expense)}
                                     className={`px-6 py-2 text-sm font-medium transition-colors w-1/2 ${type === CategoryType.Expense ? btn.danger : btn.clear
@@ -92,8 +103,11 @@ export default function AddCategory({ budgetbookId, className }: Props) {
                             />
                             
                             <div className="flex flex-col gap-1">
-                                <label className="text-sm text-gray-500">End date (optional)</label>
+                                <label className="text-sm text-gray-500" htmlFor="end-date">
+                                    End date (optional)
+                                </label>
                                 <input
+                                    id="end-date"
                                     type="date"
                                     className="border p-2 rounded"
                                     value={endDate}

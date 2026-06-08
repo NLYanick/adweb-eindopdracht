@@ -9,9 +9,10 @@ import { btn } from "../lib/button";
 type Props = {
     transaction: Transaction;
     onClose: () => void;
+    ref?: React.Ref<HTMLButtonElement>;
 };
 
-export default function EditTransaction({ transaction, onClose }: Props) {
+export default function EditTransaction({ transaction, onClose, ref }: Props) {
     const [showDelete, setShowDelete] = useState(false);
     const [type, setType] = useState<"expense" | "income">(transaction.amount < 0 ? "expense" : "income");
     const [amount, setAmount] = useState(Math.abs(transaction.amount).toString());
@@ -56,6 +57,7 @@ export default function EditTransaction({ transaction, onClose }: Props) {
                     <form onSubmit={onSubmit} className="flex flex-col gap-4">
                         <div className="flex rounded overflow-hidden border w-full">
                             <button
+                                ref={ref}
                                 type="button"
                                 onClick={() => { setType("expense"); setCategoryId(""); }}
                                 className={`px-6 py-2 text-sm font-medium transition-colors w-1/2 ${type === "expense" ? btn.danger : btn.clear}`}
@@ -83,8 +85,11 @@ export default function EditTransaction({ transaction, onClose }: Props) {
                         </select>
 
                         <div className="flex items-center">
-                            <label className="flex text-3xl w-1/8 justify-center">{type === "expense" ? "-" : "+"}</label>
+                            <label className="flex text-3xl w-1/8 justify-center" htmlFor="amount">
+                                {type === "expense" && "-" || "+"}
+                            </label>
                             <input
+                                id="amount"
                                 type="number"
                                 placeholder="Amount"
                                 className="border p-2 rounded w-7/8"

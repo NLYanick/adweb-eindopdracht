@@ -8,9 +8,10 @@ import { Category, CategoryType } from "../lib/schemas";
 type Props = {
     category: Category;
     onClose: () => void;
+    ref?: React.Ref<HTMLButtonElement>;
 };
 
-export default function EditCategory({ category, onClose }: Props) {
+export default function EditCategory({ category, onClose, ref }: Props) {
     const [showDelete, setShowDelete] = useState(false);
     const [type, setType] = useState<CategoryType>(category.type);
     const [name, setName] = useState(category.name);
@@ -45,6 +46,7 @@ export default function EditCategory({ category, onClose }: Props) {
                     <form onSubmit={onSubmit} className="flex flex-col gap-4">
                         <div className="flex rounded overflow-hidden border w-full">
                             <button
+                                ref={ref}
                                 type="button"
                                 onClick={() => setType(CategoryType.Expense)}
                                 className={`px-6 py-2 text-sm font-medium transition-colors w-1/2 ${type === CategoryType.Expense ? btn.danger : btn.clear}`}
@@ -82,8 +84,11 @@ export default function EditCategory({ category, onClose }: Props) {
                         />
 
                         <div className="flex flex-col gap-1">
-                            <label className="text-sm text-gray-500">End date (optional)</label>
+                            <label className="text-sm text-gray-500" htmlFor="end-date">
+                                End date (optional)
+                            </label>
                             <input
+                                id="end-date"
                                 type="date"
                                 className="border p-2 rounded"
                                 value={endDate}

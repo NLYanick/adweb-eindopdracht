@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCategoriesForMonth } from "../hooks/useCategoriesByMonth";
 import { useTransactionsByMonth } from "../hooks/useTransactionsByMonth";
 import { Category, CategoryType } from "../lib/schemas";
@@ -22,12 +22,23 @@ export default function CategoryList({ budgetbookId, year, month }: Props) {
   const incomeCategories  = categories.filter(c => c.type === CategoryType.Income);
   const expenseCategories = categories.filter(c => c.type === CategoryType.Expense);
 
+  const typeRef = useRef<HTMLButtonElement>(null);
+  const returnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+      if (editingCategory) {
+          typeRef.current?.focus();
+      } else {
+          returnRef.current?.focus();
+      }
+  }, [editingCategory]);
+
   const transactionsForCategory = (category: Category) =>
     transactions.filter(t => t.category === category.uid);
 
   const addButton = (
     <div className="flex justify-end mb-5">
-      <AddCategory budgetbookId={budgetbookId} />
+      <AddCategory budgetbookId={budgetbookId} ref={returnRef} />
     </div>
   );
 
@@ -86,6 +97,7 @@ export default function CategoryList({ budgetbookId, year, month }: Props) {
 
       {editingCategory && (
         <EditCategory
+          ref={typeRef}
           category={editingCategory}
           onClose={() => setEditingCategory(null)}
         />
