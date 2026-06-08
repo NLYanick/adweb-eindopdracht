@@ -3,160 +3,181 @@
 import { useAuth } from "@/app/context/AuthContext";
 import { getBudgetBook } from "@/app/services/budgetbook-service";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { watchTransactions, watchTransactionsByMonth } from "@/app/services/transaction-service";
-import { Transaction } from "@/app/lib/schemas";
-import AddTransaction from "@/app/components/AddTransaction";
-import TransactionRow from "@/app/components/TransactionRow";
-import EditTransaction from "@/app/components/EditTransaction";
-import TransactionsPanel from "@/app/components/TransactionsPanel";
+import { watchTransactionsByMonth } from "@/app/services/transaction-service";
+import { Category, Transaction } from "@/app/lib/schemas";
 import TransactionPanel from "@/app/components/TransactionsPanel";
 import CategoryList from "@/app/components/CategoryList";
 import { btn } from "@/app/lib/button";
+import {
+  LineChart, Line, BarChart, Bar,
+  XAxis, YAxis, CartesianGrid,
+  ResponsiveContainer, Legend,
+} from "recharts";
+import MetricsCards from "@/app/components/MetricsCards";
+import TransactionsMonthNav from "@/app/components/TransactionsMonthNav";
+import { useCategoriesForMonth } from "@/app/hooks/useCategoriesByMonth";
 
 export default function BudgetBookDetailPage() {
-    const { id } = useParams<{ id: string }>();
-    const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const { id } = useParams<{ id: string }>();
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const { user } = useAuth();
+  const router = useRouter();
 
-    const [name, setName] = useState("");
-    const [description, setDescription] = useState("");
-    const { user } = useAuth();
-    const router = useRouter();
+  const now = new Date();
+  const [month, setMonth] = useState(now.getMonth() + 1);
+  const [year, setYear] = useState(now.getFullYear());
+  const [debouncedMonth, setDebouncedMonth] = useState(month);
+  const [debouncedYear, setDebouncedYear] = useState(year);
+  const [tab, setTab] = useState<"transactions" | "categories">("transactions");
 
-    const now = new Date();
-    const [month, setMonth] = useState(now.getMonth() + 1);
-    const [year, setYear] = useState(now.getFullYear());
-
-    const [debouncedMonth, setDebouncedMonth] = useState(month);
-    const [debouncedYear, setDebouncedYear] = useState(year);
-
-    const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
-
-    const [tab, setTab] = useState<"transactions" | "categories">("transactions");
-
-    useEffect(() => {
-        if (!user) return;
-        const fetchData = async () => {
-            const data = await getBudgetBook(id as string);
-
-            if (!data || data.archived == true) {
-                router.push("/budgetbook");
-                return;
-            }
-
-            if (data.owner !== user?.uid && !data.sharedWith?.includes(user.uid)) {
-                router.push("/budgetbook");
-                return;
-            }
-            setName(data.name);
-            setDescription(data.description || "");
-        }
-        fetchData();
-    }, [id, user]);
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setDebouncedMonth(month);
-            setDebouncedYear(year);
-        }, 200);
-        return () => clearTimeout(timer);
-    }, [month, year]);
-
-    useEffect(() => {
-        const unsubscribe = watchTransactionsByMonth(id, debouncedYear, debouncedMonth, (t) => {
-            setTransactions(t);
-        });
-        return () => unsubscribe();
-    }, [id, debouncedYear, debouncedMonth]);
-
-    const prevMonth = async () => {
-        if (month === 1) { setMonth(12); setYear(y => y - 1); }
-        else setMonth(m => m - 1);
-    };
-
-    const nextMonth = async () => {
-        if (month === 12) { setMonth(1); setYear(y => y + 1); }
-        else setMonth(m => m + 1);
-    };
-
-    const monthLabel = new Date(year, month - 1).toLocaleString("default", {
-        month: "long",
-        year: "numeric",
+  useEffect(() => {
+    if (!user) return;
+    getBudgetBook(id).then((data) => {
+      if (!data || data.archived) { router.push("/budgetbook"); return; }
+      if (data.owner !== user.uid && !data.sharedWith?.includes(user.uid)) {
+        router.push("/budgetbook"); return;
+      }
+      setName(data.name);
+      setDescription(data.description || "");
+      
     });
+  }, [id, user]);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedMonth(month);
+      setDebouncedYear(year);
+    }, 200);
+    return () => clearTimeout(t);
+  }, [month, year]);
+
+  useEffect(() => {
+    const unsubscribe = watchTransactionsByMonth(id, debouncedYear, debouncedMonth, setTransactions);
+    return () => unsubscribe();
+  }, [id, debouncedYear, debouncedMonth]);
 
 
-    const total = transactions.reduce((sum, t) => sum + t.amount, 0);
-    const income = transactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
-    const expenses = transactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0);
+  const prevMonth = () => {
+    if (month === 1) { setMonth(12); setYear(y => y - 1); }
+    else setMonth(m => m - 1);
+  };
+  const nextMonth = () => {
+    if (month === 12) { setMonth(1); setYear(y => y + 1); }
+    else setMonth(m => m + 1);
+  };
 
-    return (
-        <div className="m-9">
+  const monthLabel = new Date(year, month - 1).toLocaleString("default", {
+    month: "long", year: "numeric",
+  });
 
-            <div className="flex justify-between">
-                <div className="mb-4">
-                    <h1 className="font-bold text-3xl">{name}</h1>
-                    <p>{description}</p>
-                </div>
-                <Link
-                    href={`/budgetbook/${id}/edit`}
-                    className={`${btn.success} h-fit`}
-                >
-                    Edit
-                </Link>
-            </div>
-            <div className="flex items-center gap-4 mb-2 justify-center">
-                <button onClick={prevMonth} className="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&lt;</button>
-                <span className="font-medium w-40 text-center">{monthLabel}</span>
-                <button onClick={nextMonth} className="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400">&gt;</button>
-            </div>
-            <div className="grid grid-cols-3 gap-4 mb-6">
+  const total    = transactions.reduce((s, t) => s + t.amount, 0);
+  const income   = transactions.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0);
+  const expenses = transactions.filter(t => t.amount < 0).reduce((s, t) => s + t.amount, 0);
 
-                {/* Balance */}
-                <div className="bg-gray-200 rounded-xl p-4 text-center font-semibold">
-                    <p className="text-sm text-gray-600">Balance</p>
-                    <p className="text-lg">€{total}</p>
-                </div>
 
-                {/* Income */}
-                <div className="bg-green-100 rounded-xl p-4 text-center font-semibold">
-                    <p className="text-sm text-green-800">Income</p>
-                    <p className="text-lg text-green-900">€{income}</p>
-                </div>
+  const categories = useCategoriesForMonth(id, debouncedYear, debouncedMonth);
 
-                {/* Expenses */}
-                <div className="bg-red-100 rounded-xl p-4 text-center font-semibold">
-                    <p className="text-sm text-red-700">Expenses</p>
-                    <p className="text-lg text-red-900">€{expenses}</p>
-                </div>
-            </div>
+  // Line chart data
+  type DayEntry = { day: number; income: number; expenses: number };
 
-            <hr />
+  const byDay = new Map<number, DayEntry>();
 
-            <div className="flex border-b mb-4">
-                <button
-                    onClick={() => setTab("transactions")}
-                    className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "transactions"
-                        ? "border-blue-500 text-black"
-                        : "border-transparent text-gray-500 hover:text-black"
-                        }`}
-                >
-                    Transactions
-                </button>
-                <button
-                    onClick={() => setTab("categories")}
-                    className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === "categories"
-                        ? "border-blue-500 text-black"
-                        : "border-transparent text-gray-500 hover:text-black"
-                        }`}
-                >
-                    Categories
-                </button>
-            </div>
+  for (const t of transactions) {
+    const day = new Date(t.date).getDate();
+    const entry = byDay.get(day) ?? { day, income: 0, expenses: 0 };
 
-            {tab === "transactions" && <TransactionPanel budgetbookId={id} month={month} year={year} />}
-            {tab === "categories" && <CategoryList budgetbookId={id} month={month} year={year} />}
+    if (t.amount > 0) entry.income   += t.amount;
+    else              entry.expenses += Math.abs(t.amount);
+
+    byDay.set(day, entry);
+  }
+
+  const lineData = Array.from(byDay.values()).sort((a, b) => a.day - b.day);
+
+  // Bar chart data
+  type CategoryEntry = { category: string; amount: number };
+
+  const byCategory: Record<string, number> = {};
+
+  const categoryMap = Object.fromEntries(categories.map(c => [c.uid, c.name]));
+
+  for (const t of transactions.filter(t => t.amount < 0)) {
+    const cat = categoryMap[t.category || ""] || "Other";
+    byCategory[cat] = (byCategory[cat] ?? 0) + Math.abs(t.amount);
+  }
+
+  const barData: CategoryEntry[] = Object.entries(byCategory)
+    .map(([category, amount]) => ({ category, amount }));
+
+  return (
+    <main className="p-20">
+
+      {/* Header */}
+      <div className="flex items-start justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-medium tracking-tight text-gray-900">{name}</h1>
+          {description && <p className="font-mono text-xs text-gray-400 mt-1">{description}</p>}
         </div>
-    )
+        <Link href={`/budgetbook/${id}/edit`} className={btn.success}>Edit</Link>
+      </div>
+
+      {/* Charts */}
+      <p className="font-mono text-[11px] tracking-widest text-gray-400 uppercase mb-3">Overview</p>
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <p className="font-mono text-[10px] tracking-widest text-gray-400 uppercase mb-3">
+            Income &amp; expenses — monthly
+          </p>
+          <ResponsiveContainer width="100%" height={180}>
+            <LineChart data={lineData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="day" tick={{ fontFamily: "DM Mono", fontSize: 10 }} />
+              <YAxis tick={{ fontFamily: "DM Mono", fontSize: 10 }} />
+              <Legend wrapperStyle={{ fontFamily: "DM Mono", fontSize: 11 }} />
+              <Line type="monotone" dataKey="income" stroke="#639922" strokeWidth={1.5} dot={false} />
+              <Line type="monotone" dataKey="expenses" stroke="#E24B4A" strokeWidth={1.5} dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <p className="font-mono text-[10px] tracking-widest text-gray-400 uppercase mb-3">
+            Expenses by category
+          </p>
+          <ResponsiveContainer width="100%" height={180}>
+            <BarChart data={barData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="category" tick={{ fontFamily: "DM Mono", fontSize: 10 }} />
+              <YAxis tick={{ fontFamily: "DM Mono", fontSize: 10 }} />
+              <Bar dataKey="amount" fill="#7F77DD" radius={[3, 3, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      <TransactionsMonthNav monthLabel={monthLabel} prevMonth={prevMonth} nextMonth={nextMonth} />
+
+      <MetricsCards total={total} income={income} expenses={expenses} />
+
+      {/* Tabs */}
+      <div className="flex border-b border-gray-200 mb-5">
+        {(["transactions", "categories"] as const).map(t => (
+          <button key={t} onClick={() => setTab(t)}
+            className={`font-mono text-xs tracking-wide px-4 py-2.5 border-b-2 -mb-px transition-colors capitalize ${
+              tab === t
+                ? "border-gray-900 text-gray-900"
+                : "border-transparent text-gray-400 hover:text-gray-700"
+            }`}>
+            {t}
+          </button>
+        ))}
+      </div>
+
+      {tab === "transactions" && <TransactionPanel budgetbookId={id} month={month} year={year} />}
+      {tab === "categories"   && <CategoryList     budgetbookId={id} month={month} year={year} />}
+    </main>
+  );
 }

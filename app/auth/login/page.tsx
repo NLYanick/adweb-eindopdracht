@@ -46,7 +46,7 @@ export default function LoginPage() {
             label="Email" 
             type="email" 
             placeholder="user@example.com"
-            // required={true}
+            required={true}
             value={email} 
             onChange={setEmail} 
           />
