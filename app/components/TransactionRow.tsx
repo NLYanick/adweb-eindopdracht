@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { btn } from "../lib/button";
 import { Category, CategoryType, Transaction } from "../lib/schemas";
 import { changeCategory } from "../services/transaction-service";
@@ -14,13 +14,16 @@ type Props = {
 export default function TransactionRow({ transaction, onEdit, categories }: Props) {
     const [category, setCategory] = useState<Category | null>(categories.find(c => c.uid === transaction.category) || null);
 
+    useEffect(() => {
+        if(!transaction.category && category) {
+            setCategory(null);
+        }
+    }, [transaction, category]);
+
     const onDrop = async (e: React.DragEvent) => {
         const categoryId = e.dataTransfer.getData("category");
         
         const newCategory = categories.find(c => c.uid === categoryId);
-
-        console.log(!category)
-        console.log(newCategory && category?.uid !== categoryId)
 
         if(!category || (newCategory && category.uid !== categoryId)) {
             if(newCategory?.type === CategoryType.Expense && transaction.amount < 0) {

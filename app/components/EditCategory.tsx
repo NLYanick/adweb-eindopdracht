@@ -14,7 +14,7 @@ export default function EditCategory({ category, onClose }: Props) {
     const [showDelete, setShowDelete] = useState(false);
     const [type, setType] = useState<CategoryType>(category.type);
     const [name, setName] = useState(category.name);
-    const [budget, setBudget] = useState(category.budget.toString());
+    const [budget, setBudget] = useState(category.budget?.toString());
     const [endDate, setEndDate] = useState(category.endDate ?? "");
 
     const onSubmit = async (e: React.FormEvent) => {
@@ -24,7 +24,7 @@ export default function EditCategory({ category, onClose }: Props) {
             budgetbook: category.budgetbook,
             type,
             name,
-            budget: parseFloat(budget),
+            budget: parseFloat(budget || "") || null,
             endDate: endDate || undefined,
         });
 
@@ -70,18 +70,16 @@ export default function EditCategory({ category, onClose }: Props) {
                             onChange={(e) => setName(e.target.value)}
                         />
 
-                        {type === CategoryType.Expense && (
-                            <input
-                                type="number"
-                                placeholder="Budget"
-                                className="border p-2 rounded"
-                                required
-                                min="0.01"
-                                step="0.01"
-                                value={budget}
-                                onChange={(e) => setBudget(e.target.value)}
-                            />
-                        )}
+                        <input
+                            type="number"
+                            placeholder={`Budget ${type === CategoryType.Income ? "(Optional)" : ""}`}
+                            className="border p-2 rounded"
+                            required={type === CategoryType.Expense}
+                            min="0.01"
+                            step="0.01"
+                            value={budget}
+                            onChange={(e) => setBudget(e.target.value)}
+                        />
 
                         <div className="flex flex-col gap-1">
                             <label className="text-sm text-gray-500">End date (optional)</label>

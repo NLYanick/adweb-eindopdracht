@@ -5,7 +5,6 @@ import { getBudgetBook } from "@/app/services/budgetbook-service";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { watchTransactionsByMonth } from "@/app/services/transaction-service";
 import { Transaction } from "@/app/lib/schemas";
 import TransactionPanel from "@/app/components/TransactionsPanel";
 import CategoryList from "@/app/components/CategoryList";
@@ -19,10 +18,10 @@ import MetricsCards from "@/app/components/MetricsCards";
 import TransactionsMonthNav from "@/app/components/TransactionsMonthNav";
 import { useCategoriesForMonth } from "@/app/hooks/useCategoriesByMonth";
 import BackButton from "@/app/components/BackButton";
+import { useTransactionsByMonth } from "@/app/hooks/useTransactionsByMonth";
 
 export default function BudgetBookDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const { user } = useAuth();
@@ -34,6 +33,8 @@ export default function BudgetBookDetailPage() {
   const [debouncedMonth, setDebouncedMonth] = useState(month);
   const [debouncedYear, setDebouncedYear] = useState(year);
   const [tab, setTab] = useState<"transactions" | "categories">("transactions");
+  
+  const transactions = useTransactionsByMonth(id, debouncedYear, debouncedMonth);
 
   useEffect(() => {
     if (!user) return;
@@ -55,12 +56,6 @@ export default function BudgetBookDetailPage() {
     }, 200);
     return () => clearTimeout(t);
   }, [month, year]);
-
-  useEffect(() => {
-    const unsubscribe = watchTransactionsByMonth(id, debouncedYear, debouncedMonth, setTransactions);
-    return () => unsubscribe();
-  }, [id, debouncedYear, debouncedMonth]);
-
 
   const prevMonth = () => {
     if (month === 1) { setMonth(12); setYear(y => y - 1); }

@@ -20,7 +20,7 @@ export default function ExpenseCategoryCard({
     .filter((t) => t.amount > 0 && t.category === category.uid)
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
-  const effectiveBudget = category.budget + income;
+  const effectiveBudget = category.budget ? category.budget + income : income;
   const remaining = effectiveBudget - expenses;
   const percentage = Math.round((expenses / effectiveBudget) * 100);
 
