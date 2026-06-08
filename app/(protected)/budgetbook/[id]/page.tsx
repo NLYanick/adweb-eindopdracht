@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { watchTransactionsByMonth } from "@/app/services/transaction-service";
-import { Category, Transaction } from "@/app/lib/schemas";
+import { Transaction } from "@/app/lib/schemas";
 import TransactionPanel from "@/app/components/TransactionsPanel";
 import CategoryList from "@/app/components/CategoryList";
 import { btn } from "@/app/lib/button";
@@ -18,6 +18,7 @@ import {
 import MetricsCards from "@/app/components/MetricsCards";
 import TransactionsMonthNav from "@/app/components/TransactionsMonthNav";
 import { useCategoriesForMonth } from "@/app/hooks/useCategoriesByMonth";
+import BackButton from "@/app/components/BackButton";
 
 export default function BudgetBookDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -124,6 +125,8 @@ export default function BudgetBookDetailPage() {
         </div>
         <Link href={`/budgetbook/${id}/edit`} className={btn.success}>Edit</Link>
       </div>
+
+      <BackButton href="/budgetbook" label="Back To Budget Books" />
 
       {/* Charts */}
       <p className="font-mono text-[11px] tracking-widest text-gray-400 uppercase mb-3">Overview</p>

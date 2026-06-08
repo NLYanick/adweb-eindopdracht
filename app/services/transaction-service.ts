@@ -86,3 +86,8 @@ export const deleteTransaction = async (uid: string) => {
     const docRef = doc(db, "transactions", uid);
     await deleteDoc(docRef);
 };
+
+export const changeCategory = async (uid: string, newCategoryId: string | null) => {
+    const docRef = doc(db, "transactions", uid);
+    await updateDoc(docRef, { category: newCategoryId });
+};

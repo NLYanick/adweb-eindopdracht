@@ -21,13 +21,11 @@ export default function AddCategory({ budgetbookId, className }: Props) {
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        console.log(parseFloat(budget || ""))
-
         await createCategory({
             budgetbook: budgetbookId,
             type,
             name,
-            budget: parseFloat(budget || ""),
+            budget: parseFloat(budget || "") || null,
             endDate: endDate || undefined,
         });
 

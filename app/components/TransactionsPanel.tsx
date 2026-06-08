@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import AddTransaction from "./AddTransaction";
 import { Transaction } from "../lib/schemas";
-import { watchTransactionsByMonth } from "../services/transaction-service";
 import TransactionRow from "./TransactionRow";
 import EditTransaction from "./EditTransaction";
 import { useTransactionsByMonth } from "../hooks/useTransactionsByMonth";
+import { useCategoriesForMonth } from "../hooks/useCategoriesByMonth";
+import DraggableCategory from "./DraggableCategory";
 
 type Props = {
   budgetbookId: string;
@@ -13,14 +14,13 @@ type Props = {
 };
 
 export default function TransactionPanel({ budgetbookId, month, year }: Props) {
-  const transactions = useTransactionsByMonth(
-    budgetbookId,
-    year,
-    month
-  );
-
+  const transactions = useTransactionsByMonth(budgetbookId, year, month);
+  const categories = useCategoriesForMonth(budgetbookId, year, month);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
 
+  const sorted = transactions.toSorted(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
 
   return (
     <div>
@@ -28,13 +28,19 @@ export default function TransactionPanel({ budgetbookId, month, year }: Props) {
         <AddTransaction id={budgetbookId} />
       </div>
 
-      <span className="text-xs text-gray-400">{transactions.length} transactions</span>
+      <p className="font-mono text-[11px] text-gray-400 mb-3">
+        {transactions.length} transaction{transactions.length !== 1 ? "s" : ""}
+      </p>
 
-      {transactions
-        .toSorted((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-        .map((t) => (
-          <TransactionRow key={t.uid} transaction={t} onEdit={setEditingTransaction} />
+      <div className="my-6 flex gap-3">
+        {categories.map(c => <DraggableCategory key={c.uid} category={c} />)}
+      </div>
+
+      <div className="flex flex-col gap-2">
+        {sorted.map((t) => (
+          <TransactionRow key={t.uid} transaction={t} onEdit={setEditingTransaction} categories={categories} />
         ))}
+      </div>
 
       {editingTransaction && (
         <EditTransaction

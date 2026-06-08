@@ -33,6 +33,6 @@ export type Category = {
     budgetbook: string;
     type: CategoryType;
     name: string;
-    budget: number;
+    budget: number | null;
     endDate?: string;
 }
