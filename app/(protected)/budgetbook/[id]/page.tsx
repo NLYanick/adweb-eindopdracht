@@ -18,17 +18,19 @@ import BackButton from "@/app/components/BackButton";
 import { useTransactionsByMonth } from "@/app/hooks/useTransactionsByMonth";
 import TransactionPanel from "@/app/components/TransactionsPanel";
 import CategoryList from "@/app/components/CategoryList";
+import { useBudgetBooksAnalytics } from "@/app/hooks/useBudgetBooksAnalytics";
+import { useMonthNavigation } from "@/app/hooks/useMonthNavigation";
 
 export default function BudgetBookDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
   const { user } = useAuth();
   const router = useRouter();
+  
+  const { month, year, prevMonth, nextMonth, monthLabel } = useMonthNavigation();
 
-  const now = new Date();
-  const [month, setMonth] = useState(now.getMonth() + 1);
-  const [year, setYear] = useState(now.getFullYear());
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  
   const [debouncedMonth, setDebouncedMonth] = useState(month);
   const [debouncedYear, setDebouncedYear] = useState(year);
 
@@ -42,6 +44,7 @@ export default function BudgetBookDetailPage() {
       if (data.owner !== user.uid && !data.sharedWith?.includes(user.uid)) {
         router.push("/budgetbook"); return;
       }
+
       setName(data.name);
       setDescription(data.description || "");
     });
@@ -52,54 +55,11 @@ export default function BudgetBookDetailPage() {
       setDebouncedMonth(month);
       setDebouncedYear(year);
     }, 200);
+
     return () => clearTimeout(t);
   }, [month, year]);
 
-  const prevMonth = () => {
-    if (month === 1) { setMonth(12); setYear(y => y - 1); }
-    else setMonth(m => m - 1);
-  };
-  const nextMonth = () => {
-    if (month === 12) { setMonth(1); setYear(y => y + 1); }
-    else setMonth(m => m + 1);
-  };
-
-  const monthLabel = new Date(year, month - 1).toLocaleString("default", {
-    month: "long", year: "numeric",
-  });
-
-  const total    = transactions.reduce((s, t) => s + t.amount, 0);
-  const income   = transactions.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0);
-  const expenses = transactions.filter(t => t.amount < 0).reduce((s, t) => s + t.amount, 0);
-
-  // Line data
-  type DayEntry = { day: number; income: number; expenses: number };
-  const byDay = new Map<number, DayEntry>();
-
-  for (const t of transactions) {
-    const day = new Date(t.date).getDate();
-    const entry = byDay.get(day) ?? { day, income: 0, expenses: 0 };
-
-    if (t.amount > 0) entry.income   += t.amount;
-    else              entry.expenses += Math.abs(t.amount);
-
-    byDay.set(day, entry);
-  }
-
-  const lineData = Array.from(byDay.values()).sort((a, b) => a.day - b.day);
-
-  // Bar data
-  type CategoryEntry = { category: string; amount: number };
-  const byCategory: Record<string, number> = {};
-  const categoryMap = Object.fromEntries(categories.map(c => [c.uid, c.name]));
-
-  for (const t of transactions.filter(t => t.amount < 0)) {
-    const cat = categoryMap[t.category || ""] || "Other";
-    byCategory[cat] = (byCategory[cat] ?? 0) + Math.abs(t.amount);
-  }
-
-  const barData: CategoryEntry[] = Object.entries(byCategory)
-    .map(([category, amount]) => ({ category, amount }));
+  const { total, income, expenses, lineData, barData } = useBudgetBooksAnalytics(transactions, categories);
 
   return (
     <main className="p-20">
