@@ -19,13 +19,16 @@ export default function RegisterPage() {
     if (user) router.push("/");
   }, [user]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     if (!email || !password || !name) {
       setError("Please fill in all fields.");
       return;
     }
+
     const isRegistered = await register(email, password, name);
+    
     if (isRegistered) router.push("/");
     else setError("Registration failed. Please try again.");
   };

@@ -109,3 +109,27 @@ export async function shareBudgetBook(uid: string, userEmail: string | undefined
         sharedWith: [...budgetBook?.sharedWith || [], user.uid],
     });
 }
+
+export async function unshareBudgetBook(uid: string, userEmail: string | undefined) {
+    if (!userEmail) return;
+    
+    const userArray = await getUsersByEmail(userEmail, "", 1);
+    if(!userArray) {
+        console.error("User not found with email:", userEmail);
+        return;
+    }
+    const user = userArray[0];
+
+    const docRef = doc(db, "budgetbooks", uid);
+
+    const budgetBook = await getBudgetBook(uid);
+
+    if (!budgetBook?.sharedWith?.includes(user.uid)) {
+        console.warn("User does not have access to this budget book:", userEmail);
+        return;
+    }
+
+    await updateDoc(docRef, {
+        sharedWith: budgetBook?.sharedWith?.filter((uid): uid is string => uid !== user.uid),
+    });
+}

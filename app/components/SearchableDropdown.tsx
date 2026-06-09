@@ -50,7 +50,7 @@ export default function SearchableDropdown({ array, onClick }: { array: any[]; o
               key={item.uid}
             >
               <button
-                className="px-3 py-2.5 text-sm font-mono text-gray-700 hover:bg-gray-50 cursor-pointer"
+                className="px-3 py-2.5 text-sm font-mono text-gray-700 hover:bg-gray-50 cursor-pointer w-full text-left"
                 onMouseDown={() => onButtonClick(item)}
                 onKeyDown={(e) => {
                   if(e.key === "Enter") {

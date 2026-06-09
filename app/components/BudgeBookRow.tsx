@@ -8,7 +8,7 @@ export default function BudgetBookItem({ budgetbook }: { budgetbook: Budgetbook 
   const isOwner = budgetbook.owner === user?.uid;
 
   return (
-    <li className="grid grid-cols-[18ch_1fr_auto_auto] items-center gap-4 bg-white border border-gray-200 rounded-lg px-5 py-3.5 hover:border-gray-300 transition-colors">
+    <div className="grid grid-cols-[18ch_1fr_auto_auto] items-center gap-4 bg-white border border-gray-200 rounded-lg px-5 py-3.5 hover:border-gray-300 transition-colors">
       <span className="truncate font-semibold text-[15px] text-gray-900">
         {budgetbook.name}
       </span>
@@ -40,6 +40,6 @@ export default function BudgetBookItem({ budgetbook }: { budgetbook: Budgetbook 
           Detail →
         </Link>
       )}
-    </li>
+    </div>
   );
 }

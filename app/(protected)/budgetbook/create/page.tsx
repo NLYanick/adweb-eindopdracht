@@ -2,7 +2,6 @@
 import { useAuth } from "@/app/context/AuthContext";
 import { btn } from "@/app/lib/button";
 import { createBudgetBook } from "@/app/services/budgetbook-service";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -26,10 +25,10 @@ export default function New() {
 
   return (
     <main className="p-20">
-      <div className="mb-8">
+      <header className="mb-8">
         <h1 className="text-2xl font-medium tracking-tight text-gray-900">Create New Budget Book</h1>
         <p className="text-xs font-mono text-gray-400 mt-1">{name}</p>
-      </div>
+      </header>
 
       <section className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
         <form onSubmit={onSubmit} className="flex flex-col gap-5">

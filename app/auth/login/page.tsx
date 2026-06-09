@@ -18,13 +18,16 @@ export default function LoginPage() {
     if (user) router.push("/");
   }, [user]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     if (!email || !password) {
       setError("Please fill in all fields.");
       return;
     }
+
     const isLogged = await login(email, password);
+    
     if (isLogged) router.push("/");
     else setError("Login failed. Please try again.");
   };

@@ -16,6 +16,7 @@ export default function Home() {
 
   useEffect(() => {
     if (loading || !user) return;
+
     const unsubscribe = watchBudgetBooks(user.uid, showArchived, setBudgetBooks);
     return () => unsubscribe();
   }, [user, loading, showArchived]);
@@ -23,7 +24,7 @@ export default function Home() {
   return (
     <main className="p-20">
       <div className="flex items-start justify-between mb-8">
-        <div>
+        <header>
           <AnimatePresence mode="wait" initial={false}>
             <motion.h1
               key={showArchived ? "archived" : "active"}
@@ -42,7 +43,8 @@ export default function Home() {
           >
             {showArchived ? "Show active" : "Show archived"}
           </button>
-        </div>
+        </header>
+
         <AnimatePresence>
           {!showArchived && (
             <motion.div
@@ -59,40 +61,42 @@ export default function Home() {
         </AnimatePresence>
       </div>
 
-      <AnimatePresence mode="wait">
-        <motion.ul
-          key={showArchived ? "archived-list" : "active-list"}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{    opacity: 0 }}
-          transition={{ duration: 0.15 }}
-          className="flex flex-col gap-2.5"
-        >
-          <AnimatePresence initial={false}>
-            {budgetbooks.length === 0 ? (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center font-mono text-sm text-gray-400 py-16"
-              >
-                {showArchived ? "No archived books." : "No budget books yet."}
-              </motion.p>
-            ) : (
-              budgetbooks.map((budgetbook, i) => (
-                <motion.li
-                  key={budgetbook.uid}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{    opacity: 0, x: -12 }}
-                  transition={{ duration: 0.2, ease: "easeOut", delay: i * 0.05 }}
+      <section>
+        <AnimatePresence mode="wait">
+          <motion.ul
+            key={showArchived ? "archived-list" : "active-list"}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{    opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="flex flex-col gap-2.5"
+          >
+            <AnimatePresence initial={false}>
+              {budgetbooks.length === 0 ? (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center font-mono text-sm text-gray-400 py-16"
                 >
-                  <BudgetBookItem budgetbook={budgetbook} />
-                </motion.li>
-              ))
-            )}
-          </AnimatePresence>
-        </motion.ul>
-      </AnimatePresence>
+                  {showArchived ? "No archived books." : "No budget books yet."}
+                </motion.p>
+              ) : (
+                budgetbooks.map((budgetbook, i) => (
+                  <motion.li
+                    key={budgetbook.uid}
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{    opacity: 0, x: -12 }}
+                    transition={{ duration: 0.2, ease: "easeOut", delay: i * 0.05 }}
+                  >
+                    <BudgetBookItem budgetbook={budgetbook} />
+                  </motion.li>
+                ))
+              )}
+            </AnimatePresence>
+          </motion.ul>
+        </AnimatePresence>
+      </section>
     </main>
   );
 }

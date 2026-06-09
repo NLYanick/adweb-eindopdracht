@@ -103,19 +103,19 @@ export default function BudgetBookDetailPage() {
 
   return (
     <main className="p-20">
-      <div className="flex items-start justify-between mb-2">
+      <header className="flex items-start justify-between mb-2">
         <div>
           <h1 className="text-2xl font-medium tracking-tight text-gray-900">{name}</h1>
           {description && <p className="font-mono text-xs text-gray-400 mt-1">{description}</p>}
         </div>
         <Link href={`/budgetbook/${id}/edit`} className={btn.success}>Edit</Link>
-      </div>
+      </header>
 
       <BackButton href="/budgetbook" label="Back To Budget Books" />
 
       <p className="font-mono text-[11px] tracking-widest text-gray-400 uppercase mb-3 mt-8">Overview</p>
       
-      <div className="grid grid-cols-2 gap-3 mb-6">
+      <section className="grid grid-cols-2 gap-3 mb-6">
         <div className="bg-white border border-gray-200 rounded-xl p-4">
           <p className="font-mono text-[10px] tracking-widest text-gray-400 uppercase mb-3">
             Income &amp; expenses — monthly
@@ -145,17 +145,18 @@ export default function BudgetBookDetailPage() {
             </BarChart>
           </ResponsiveContainer>
         </div>
-      </div>
+      </section>
 
-      <TransactionsMonthNav monthLabel={monthLabel} prevMonth={prevMonth} nextMonth={nextMonth} />
+      <section>
+        <TransactionsMonthNav monthLabel={monthLabel} prevMonth={prevMonth} nextMonth={nextMonth} />
 
-      <MetricsCards total={total} income={income} expenses={expenses} />
+        <MetricsCards total={total} income={income} expenses={expenses} />
+      </section>
 
-      {/* Two-column layout — no tabs */}
-      <div className="grid grid-cols-2 gap-4 mt-6 items-start">
+      <section className="grid grid-cols-2 gap-4 mt-6 items-start">
         <TransactionPanel budgetbookId={id} month={month} year={year} />
         <CategoryList     budgetbookId={id} month={month} year={year} />
-      </div>
+      </section>
     </main>
   );
 }
