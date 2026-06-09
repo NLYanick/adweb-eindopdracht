@@ -15,15 +15,25 @@ type Props = {
 
 export default function TransactionPanel({ budgetbookId, month, year }: Props) {
   const transactions = useTransactionsByMonth(budgetbookId, year, month);
-  const categories   = useCategoriesForMonth(budgetbookId, year, month);
+  const categories = useCategoriesForMonth(budgetbookId, year, month);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
-  const typeRef = useRef<HTMLButtonElement>(null);
+
+  const editButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const modalTypeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (editingTransaction) typeRef.current?.focus();
+    if (editingTransaction) {
+      modalTypeRef.current?.focus();
+    }
   }, [editingTransaction]);
 
-  const categorised   = transactions.filter(t => t.category);
+  const closeEdit = () => {
+    const uid = editingTransaction?.uid;
+    setEditingTransaction(null);
+    if (uid) editButtonRefs.current[uid]?.focus();
+  };
+
+  const categorised = transactions.filter(t => t.category);
   const uncategorised = transactions.filter(t => !t.category);
 
   const sorted = (list: Transaction[]) =>
@@ -53,6 +63,9 @@ export default function TransactionPanel({ budgetbookId, month, year }: Props) {
                   key={t.uid}
                   transaction={t}
                   onEdit={setEditingTransaction}
+                  editButtonRef={(el: HTMLButtonElement | null) => {
+                    editButtonRefs.current[t.uid] = el;
+                  }}
                   categories={categories}
                 />
               ))}
@@ -73,6 +86,9 @@ export default function TransactionPanel({ budgetbookId, month, year }: Props) {
                   key={t.uid}
                   transaction={t}
                   onEdit={setEditingTransaction}
+                  editButtonRef={(el: HTMLButtonElement | null) => {
+                    editButtonRefs.current[t.uid] = el;
+                  }}
                   categories={categories}
                 />
               ))}
@@ -85,8 +101,8 @@ export default function TransactionPanel({ budgetbookId, month, year }: Props) {
         {editingTransaction && (
           <EditTransaction
             transaction={editingTransaction}
-            onClose={() => setEditingTransaction(null)}
-            ref={typeRef}
+            onClose={closeEdit}
+            ref={modalTypeRef}
           />
         )}
       </AnimatePresence>

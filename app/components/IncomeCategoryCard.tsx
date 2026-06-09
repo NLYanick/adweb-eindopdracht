@@ -4,6 +4,7 @@ interface IncomeCategoryCardProps {
   category: Category;
   transactions: Transaction[];
   onEdit: (category: Category) => void;
+  editButtonRef?: React.Ref<HTMLButtonElement>;
   onDragOver?: (e: React.DragEvent) => void;
   onDragLeave?: (e: React.DragEvent) => void;
   onDrop?: (e: React.DragEvent) => void;
@@ -14,6 +15,7 @@ export default function IncomeCategoryCard({
   category,
   transactions,
   onEdit,
+  editButtonRef,
   onDragOver,
   onDragLeave,
   onDrop,
@@ -47,9 +49,7 @@ export default function IncomeCategoryCard({
       </div>
 
       <div>
-        <p className="text-xl font-medium text-[#27500A]">
-          +€{totalIncome.toFixed(2)}
-        </p>
+        <p className="text-xl font-medium text-[#27500A]">+€{totalIncome.toFixed(2)}</p>
         <p className="font-mono text-[10px] text-gray-400 mt-0.5">
           total earned · {transactionCount} {transactionCount === 1 ? "transaction" : "transactions"}
         </p>
@@ -57,6 +57,7 @@ export default function IncomeCategoryCard({
 
       <div className="flex justify-end">
         <button
+          ref={editButtonRef}
           onClick={() => onEdit(category)}
           className="font-mono text-[11px] px-3 py-1.5 border border-gray-200 rounded-md text-gray-500 hover:border-gray-300 hover:text-gray-900 transition-colors"
         >

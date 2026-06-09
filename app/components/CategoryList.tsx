@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useCategoriesForMonth } from "../hooks/useCategoriesByMonth";
 import { useTransactionsByMonth } from "../hooks/useTransactionsByMonth";
-import { Category, CategoryType, Transaction } from "../lib/schemas";
+import { Category, CategoryType } from "../lib/schemas";
 import AddCategory from "./AddCategory";
 import ExpenseCategoryCard from "./ExpenseCategoryCard";
 import IncomeCategoryCard from "./IncomeCategoryCard";
@@ -20,18 +20,29 @@ export default function CategoryList({ budgetbookId, year, month }: Props) {
   const [overCategoryId, setOverCategoryId] = useState<string | null>(null);
 
   const transactions = useTransactionsByMonth(budgetbookId, year, month);
-  const categories = useCategoriesForMonth(budgetbookId, year, month);
+  const categories   = useCategoriesForMonth(budgetbookId, year, month);
 
-  const incomeCategories = categories.filter(c => c.type === CategoryType.Income);
+  const incomeCategories  = categories.filter(c => c.type === CategoryType.Income);
   const expenseCategories = categories.filter(c => c.type === CategoryType.Expense);
 
-  const typeRef = useRef<HTMLButtonElement>(null);
-  const returnRef = useRef<HTMLButtonElement>(null);
+  const editButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const modalTypeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (editingCategory) typeRef.current?.focus();
-    else returnRef.current?.focus();
+    if (editingCategory) {
+      modalTypeRef.current?.focus();
+    }
   }, [editingCategory]);
+
+  const openEdit = (category: Category) => {
+    setEditingCategory(category);
+  };
+
+  const closeEdit = () => {
+    const uid = editingCategory?.uid;
+    setEditingCategory(null);
+    if (uid) editButtonRefs.current[uid]?.focus();
+  };
 
   const transactionsForCategory = (category: Category) =>
     transactions.filter(t => t.category === category.uid);
@@ -45,9 +56,8 @@ export default function CategoryList({ budgetbookId, year, month }: Props) {
     const transaction = transactions.find(t => t.uid === transactionId);
     if (!transaction) return;
 
-    // Type guard: only allow income on income categories, expenses on expense categories
     const isCompatible =
-      (category.type === CategoryType.Income && transaction.amount > 0) ||
+      (category.type === CategoryType.Income  && transaction.amount > 0) ||
       (category.type === CategoryType.Expense && transaction.amount < 0);
 
     if (!isCompatible) return;
@@ -56,24 +66,26 @@ export default function CategoryList({ budgetbookId, year, month }: Props) {
   };
 
   const dropHandlers = (category: Category) => ({
-    onDragOver: (e: React.DragEvent) => { e.preventDefault(); setOverCategoryId(category.uid); },
+    onDragOver:  (e: React.DragEvent) => { e.preventDefault(); setOverCategoryId(category.uid); },
     onDragLeave: () => setOverCategoryId(null),
-    onDrop: (e: React.DragEvent) => handleDrop(e, category),
+    onDrop:      (e: React.DragEvent) => handleDrop(e, category),
   });
 
   const renderCard = (category: Category) => {
     const isOver = overCategoryId === category.uid;
-    const cardTransactions = transactionsForCategory(category);
     const commonProps = {
       category,
-      transactions: cardTransactions,
-      onEdit: setEditingCategory,
+      transactions: transactionsForCategory(category),
+      onEdit: openEdit,
+      editButtonRef: (el: HTMLButtonElement | null) => {
+        editButtonRefs.current[category.uid] = el;
+      },
       className: isOver ? "ring-2 ring-green-400" : "",
       ...dropHandlers(category),
     };
 
     return category.type === CategoryType.Income
-      ? <IncomeCategoryCard key={category.uid} {...commonProps} />
+      ? <IncomeCategoryCard  key={category.uid} {...commonProps} />
       : <ExpenseCategoryCard key={category.uid} {...commonProps} />;
   };
 
@@ -98,7 +110,6 @@ export default function CategoryList({ budgetbookId, year, month }: Props) {
               </div>
             </section>
           )}
-
           {expenseCategories.length > 0 && (
             <section>
               <p className="font-mono text-[11px] tracking-widest text-gray-400 uppercase mb-3">Expenses</p>
@@ -113,9 +124,9 @@ export default function CategoryList({ budgetbookId, year, month }: Props) {
       <AnimatePresence>
         {editingCategory && (
           <EditCategory
-            ref={typeRef}
+            ref={modalTypeRef}
             category={editingCategory}
-            onClose={() => setEditingCategory(null)}
+            onClose={closeEdit}
           />
         )}
       </AnimatePresence>

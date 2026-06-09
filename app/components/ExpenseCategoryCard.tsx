@@ -6,6 +6,7 @@ interface ExpenseCategoryCardProps {
   category: Category;
   transactions: Transaction[];
   onEdit: (category: Category) => void;
+  editButtonRef?: React.Ref<HTMLButtonElement>;
   onDragOver?: (e: React.DragEvent) => void;
   onDragLeave?: (e: React.DragEvent) => void;
   onDrop?: (e: React.DragEvent) => void;
@@ -32,6 +33,7 @@ function AnimatedNumber({ value, prefix = "€" }: { value: number; prefix?: str
 export default function ExpenseCategoryCard({
   category,
   transactions,
+  editButtonRef,
   onEdit,
   onDragOver,
   onDragLeave,
@@ -119,6 +121,7 @@ export default function ExpenseCategoryCard({
 
       <div className="flex justify-end">
         <button
+          ref={editButtonRef}
           onClick={() => onEdit(category)}
           className="font-mono text-[11px] px-3 py-1.5 border border-gray-200 rounded-md text-gray-500 hover:border-gray-300 hover:text-gray-900 transition-colors"
         >

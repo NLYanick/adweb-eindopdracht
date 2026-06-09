@@ -7,10 +7,11 @@ import { Category, Transaction } from "../lib/schemas";
 type Props = {
   transaction: Transaction;
   onEdit: (transaction: Transaction) => void;
+  editButtonRef?: React.Ref<HTMLButtonElement>;
   categories: Category[];
 };
 
-export default function TransactionRow({ transaction, onEdit, categories }: Props) {
+export default function TransactionRow({ transaction, onEdit, editButtonRef, categories }: Props) {
   const [category, setCategory] = useState<Category | null>(
     categories.find(c => c.uid === transaction.category) ?? null
   );
@@ -62,6 +63,7 @@ export default function TransactionRow({ transaction, onEdit, categories }: Prop
         </span>
         <button
           onClick={() => onEdit(transaction)}
+          ref={editButtonRef}
           className="border border-gray-200 rounded-lg px-3 py-1.5 font-mono text-[11px] text-gray-500 hover:border-gray-300 hover:text-gray-900 transition-colors"
         >
           Edit
