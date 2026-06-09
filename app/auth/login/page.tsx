@@ -33,39 +33,43 @@ export default function LoginPage() {
     <main className="flex items-center justify-center min-h-screen bg-gray-50">
       <div className="bg-white border border-gray-200 rounded-xl px-8 py-10 w-full max-w-md">
 
-        <p className="text-center font-mono text-[11px] tracking-widest text-gray-400 uppercase mb-6">
-          Budgetbook
-        </p>
+        <header>
+          <p className="text-center font-mono text-[11px] tracking-widest text-gray-400 uppercase mb-6">
+            Budgetbook
+          </p>
 
-        <h1 className="text-2xl font-medium text-gray-900 text-center">Login</h1>
-        <p className="text-center font-mono text-xs text-gray-400 mt-1 mb-8">Start managing your finances</p>
+          <h1 className="text-2xl font-medium text-gray-900 text-center">Login</h1>
+          <p className="text-center font-mono text-xs text-gray-400 mt-1 mb-8">Start managing your finances</p>
+        </header>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <AuthInput 
-            id="email" 
-            label="Email" 
-            type="email" 
-            placeholder="user@example.com"
-            required={true}
-            value={email} 
-            onChange={setEmail} 
-          />
-          <AuthInput 
-            id="password" 
-            label="Password" 
-            type="password" 
-            placeholder="••••••••"
-            value={password} 
-            onChange={setPassword} 
-            required={true} 
-          />
+        <section>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <AuthInput 
+              id="email" 
+              label="Email" 
+              type="email" 
+              placeholder="user@example.com"
+              required={true}
+              value={email} 
+              onChange={setEmail} 
+            />
+            <AuthInput 
+              id="password" 
+              label="Password" 
+              type="password" 
+              placeholder="••••••••"
+              value={password} 
+              onChange={setPassword} 
+              required={true} 
+            />
 
-          <button type="submit"
-            className={btn.primary + " mt-2 py-3"}>
-            Login
-          </button>
-          {error && <p className="text-red-500 text-sm font-mono">{error}</p>}
-        </form>
+            <button type="submit"
+              className={btn.primary + " mt-2 py-3"}>
+              Login
+            </button>
+            {error && <p className="text-red-500 text-sm font-mono">{error}</p>}
+          </form>
+        </section>
 
         <div className="flex items-center gap-3 my-6">
           <hr className="flex-1 border-gray-100" />

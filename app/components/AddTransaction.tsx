@@ -7,9 +7,8 @@ import { useCategoriesForMonth } from "../hooks/useCategoriesByMonth";
 type Props = {
     id: string;
     className?: string;
-    ref?: React.Ref<HTMLButtonElement>;
 };
-export default function AddTransaction({ id, className, ref }: Props) {
+export default function AddTransaction({ id, className }: Props) {
     const [show, setShow] = useState(false);
 
     const today = new Date().toISOString().split("T")[0];
@@ -60,7 +59,6 @@ export default function AddTransaction({ id, className, ref }: Props) {
     return (
         <div className={className ?? ""} onClick={() => setShow(false)}>
             <button
-                ref={ref}
                 onClick={(e) => { setShow(true); e.stopPropagation() }}
                 className={btn.primary}
             >

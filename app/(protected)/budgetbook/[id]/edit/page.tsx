@@ -57,10 +57,8 @@ export default function EditBudgetBookPage() {
             setUsers(filteredUsers.slice(0, 15));
         });
 
-        return () => {
-            unsubscribe();
-        };
-    }, [users, id, sharedWith]);
+        return () => unsubscribe();
+    }, [id, sharedWith]);
 
 
     const onSubmit = async (e: React.SubmitEvent) => {

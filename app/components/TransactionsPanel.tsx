@@ -19,13 +19,10 @@ export default function TransactionPanel({ budgetbookId, month, year }: Props) {
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
 
   const typeRef = useRef<HTMLButtonElement>(null);
-  const returnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
       if (editingTransaction) {
           typeRef.current?.focus();
-      } else {
-          returnRef.current?.focus();
       }
   }, [editingTransaction]);
 
@@ -36,7 +33,7 @@ export default function TransactionPanel({ budgetbookId, month, year }: Props) {
   return (
     <div>
       <div className="flex justify-end mb-4">
-        <AddTransaction id={budgetbookId} ref={returnRef} />
+        <AddTransaction id={budgetbookId} />
       </div>
 
       <p className="font-mono text-[11px] text-gray-400 mb-3">

@@ -38,7 +38,7 @@ export default function CategoryList({ budgetbookId, year, month }: Props) {
 
   const addButton = (
     <div className="flex justify-end mb-5">
-      <AddCategory budgetbookId={budgetbookId} ref={returnRef} />
+      <AddCategory budgetbookId={budgetbookId} />
     </div>
   );
 

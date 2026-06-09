@@ -8,10 +8,9 @@ import { CategoryType } from "../lib/schemas";
 type Props = {
     budgetbookId: string;
     className?: string;
-    ref?: React.Ref<HTMLButtonElement>;
 };
 
-export default function AddCategory({ budgetbookId, className, ref }: Props) {
+export default function AddCategory({ budgetbookId, className }: Props) {
     const [show, setShow] = useState(false);
 
     const [type, setType] = useState<CategoryType>(CategoryType.Expense);
@@ -48,7 +47,6 @@ export default function AddCategory({ budgetbookId, className, ref }: Props) {
     return (
         <div className={className ?? ""}>
             <button
-                ref={ref}
                 onClick={() => setShow(true)}
                 className={btn.primary}
             >
