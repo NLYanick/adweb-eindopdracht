@@ -1,20 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Category, Transaction } from "../lib/schemas";
 
 type Props = {
   transaction: Transaction;
-  onEdit: (transaction: Transaction) => void;
-  editButtonRef?: React.Ref<HTMLButtonElement>;
+  onEdit: (transaction: Transaction, returnFocus: () => void) => void;
   categories: Category[];
 };
 
-export default function TransactionRow({ transaction, onEdit, editButtonRef, categories }: Props) {
+export default function TransactionRow({ transaction, onEdit, categories }: Props) {
   const [category, setCategory] = useState<Category | null>(
     categories.find(c => c.uid === transaction.category) ?? null
   );
+  const editButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!transaction.category && category) setCategory(null);
@@ -36,7 +36,7 @@ export default function TransactionRow({ transaction, onEdit, editButtonRef, cat
       className="group bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 flex items-center justify-between cursor-grab active:cursor-grabbing hover:border-gray-300 transition-colors"
     >
       <div className="flex items-center gap-4 min-w-0">
-        <div 
+        <div
           className="w-2 h-2 rounded-full shrink-0"
           style={{ background: transaction.amount > 0 ? "#639922" : "#E24B4A" }}
         />
@@ -62,8 +62,8 @@ export default function TransactionRow({ transaction, onEdit, editButtonRef, cat
           {transaction.amount > 0 ? "+" : "−"} €{Math.abs(transaction.amount).toFixed(2)}
         </span>
         <button
-          onClick={() => onEdit(transaction)}
           ref={editButtonRef}
+          onClick={() => onEdit(transaction, () => editButtonRef.current?.focus())}
           className="border border-gray-200 rounded-lg px-3 py-1.5 font-mono text-[11px] text-gray-500 hover:border-gray-300 hover:text-gray-900 transition-colors"
         >
           Edit

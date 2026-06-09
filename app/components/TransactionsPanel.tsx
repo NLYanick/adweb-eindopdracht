@@ -18,19 +18,21 @@ export default function TransactionPanel({ budgetbookId, month, year }: Props) {
   const categories = useCategoriesForMonth(budgetbookId, year, month);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
 
-  const editButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const returnFocusRef = useRef<(() => void) | null>(null);
   const modalTypeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (editingTransaction) {
-      modalTypeRef.current?.focus();
-    }
+    if (editingTransaction) modalTypeRef.current?.focus();
   }, [editingTransaction]);
 
+  const openEdit = (transaction: Transaction, returnFocus: () => void) => {
+    returnFocusRef.current = returnFocus;
+    setEditingTransaction(transaction);
+  };
+
   const closeEdit = () => {
-    const uid = editingTransaction?.uid;
     setEditingTransaction(null);
-    if (uid) editButtonRefs.current[uid]?.focus();
+    returnFocusRef.current?.();
   };
 
   const categorised = transactions.filter(t => t.category);
@@ -62,10 +64,7 @@ export default function TransactionPanel({ budgetbookId, month, year }: Props) {
                 <TransactionRow
                   key={t.uid}
                   transaction={t}
-                  onEdit={setEditingTransaction}
-                  editButtonRef={(el: HTMLButtonElement | null) => {
-                    editButtonRefs.current[t.uid] = el;
-                  }}
+                  onEdit={openEdit}
                   categories={categories}
                 />
               ))}
@@ -85,10 +84,7 @@ export default function TransactionPanel({ budgetbookId, month, year }: Props) {
                 <TransactionRow
                   key={t.uid}
                   transaction={t}
-                  onEdit={setEditingTransaction}
-                  editButtonRef={(el: HTMLButtonElement | null) => {
-                    editButtonRefs.current[t.uid] = el;
-                  }}
+                  onEdit={openEdit}
                   categories={categories}
                 />
               ))}

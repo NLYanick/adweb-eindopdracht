@@ -25,7 +25,7 @@ export default function CategoryList({ budgetbookId, year, month }: Props) {
   const incomeCategories  = categories.filter(c => c.type === CategoryType.Income);
   const expenseCategories = categories.filter(c => c.type === CategoryType.Expense);
 
-  const editButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const returnFocusRef = useRef<(() => void) | null>(null);
   const modalTypeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -34,14 +34,14 @@ export default function CategoryList({ budgetbookId, year, month }: Props) {
     }
   }, [editingCategory]);
 
-  const openEdit = (category: Category) => {
+  const openEdit = (category: Category, returnFocus: () => void) => {
+    returnFocusRef.current = returnFocus;
     setEditingCategory(category);
   };
 
   const closeEdit = () => {
-    const uid = editingCategory?.uid;
     setEditingCategory(null);
-    if (uid) editButtonRefs.current[uid]?.focus();
+    returnFocusRef.current?.();
   };
 
   const transactionsForCategory = (category: Category) =>
@@ -77,9 +77,6 @@ export default function CategoryList({ budgetbookId, year, month }: Props) {
       category,
       transactions: transactionsForCategory(category),
       onEdit: openEdit,
-      editButtonRef: (el: HTMLButtonElement | null) => {
-        editButtonRefs.current[category.uid] = el;
-      },
       className: isOver ? "ring-2 ring-green-400" : "",
       ...dropHandlers(category),
     };
