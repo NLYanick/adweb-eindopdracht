@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import AddTransaction from "./AddTransaction";
 import { Transaction } from "../lib/schemas";
 import TransactionRow from "./TransactionRow";
 import EditTransaction from "./EditTransaction";
 import { useTransactionsByMonth } from "../hooks/useTransactionsByMonth";
 import { useCategoriesForMonth } from "../hooks/useCategoriesByMonth";
-import { AnimatePresence } from "motion/react";
 
 type Props = {
   budgetbookId: string;
@@ -15,7 +15,7 @@ type Props = {
 
 export default function TransactionPanel({ budgetbookId, month, year }: Props) {
   const transactions = useTransactionsByMonth(budgetbookId, year, month);
-  const categories = useCategoriesForMonth(budgetbookId, year, month);
+  const categories   = useCategoriesForMonth(budgetbookId, year, month);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const typeRef = useRef<HTMLButtonElement>(null);
 
@@ -23,7 +23,7 @@ export default function TransactionPanel({ budgetbookId, month, year }: Props) {
     if (editingTransaction) typeRef.current?.focus();
   }, [editingTransaction]);
 
-  const categorised = transactions.filter(t => t.category);
+  const categorised   = transactions.filter(t => t.category);
   const uncategorised = transactions.filter(t => !t.category);
 
   const sorted = (list: Transaction[]) =>
@@ -47,14 +47,16 @@ export default function TransactionPanel({ budgetbookId, month, year }: Props) {
             Uncategorised — drag to a category
           </p>
           <div className="flex flex-col gap-2">
-            {sorted(uncategorised).map(t => (
-              <TransactionRow
-                key={t.uid}
-                transaction={t}
-                onEdit={setEditingTransaction}
-                categories={categories}
-              />
-            ))}
+            <AnimatePresence initial={false}>
+              {sorted(uncategorised).map(t => (
+                <TransactionRow
+                  key={t.uid}
+                  transaction={t}
+                  onEdit={setEditingTransaction}
+                  categories={categories}
+                />
+              ))}
+            </AnimatePresence>
           </div>
         </div>
       )}
@@ -65,27 +67,27 @@ export default function TransactionPanel({ budgetbookId, month, year }: Props) {
             Categorised
           </p>
           <div className="flex flex-col gap-2">
-            {sorted(categorised).map(t => (
-              <TransactionRow
-                key={t.uid}
-                transaction={t}
-                onEdit={setEditingTransaction}
-                categories={categories}
-              />
-            ))}
+            <AnimatePresence initial={false}>
+              {sorted(categorised).map(t => (
+                <TransactionRow
+                  key={t.uid}
+                  transaction={t}
+                  onEdit={setEditingTransaction}
+                  categories={categories}
+                />
+              ))}
+            </AnimatePresence>
           </div>
         </div>
       )}
 
-      <AnimatePresence>
-        {editingTransaction && (
-          <EditTransaction
-            transaction={editingTransaction}
-            onClose={() => setEditingTransaction(null)}
-            ref={typeRef}
-          />
-        )}
-      </AnimatePresence>
+      {editingTransaction && (
+        <EditTransaction
+          transaction={editingTransaction}
+          onClose={() => setEditingTransaction(null)}
+          ref={typeRef}
+        />
+      )}
     </div>
   );
 }

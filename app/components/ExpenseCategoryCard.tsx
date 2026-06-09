@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from "react";
+import { animate, motion } from "motion/react";
 import { Category, Transaction } from "../lib/schemas";
 
 interface ExpenseCategoryCardProps {
@@ -8,6 +10,23 @@ interface ExpenseCategoryCardProps {
   onDragLeave?: (e: React.DragEvent) => void;
   onDrop?: (e: React.DragEvent) => void;
   className?: string;
+}
+
+function AnimatedNumber({ value, prefix = "€" }: { value: number; prefix?: string }) {
+  const [display, setDisplay] = useState(value);
+  const prevRef = useRef(value);
+
+  useEffect(() => {
+    const controls = animate(prevRef.current, value, {
+      duration: 0.4,
+      ease: "easeOut",
+      onUpdate: (v) => setDisplay(v),
+    });
+    prevRef.current = value;
+    return () => controls.stop();
+  }, [value]);
+
+  return <span>{prefix}{display.toFixed(2)}</span>;
 }
 
 export default function ExpenseCategoryCard({
@@ -29,7 +48,9 @@ export default function ExpenseCategoryCard({
 
   const effectiveBudget = category.budget ? category.budget + income : income;
   const remaining  = effectiveBudget - expenses;
-  const percentage = effectiveBudget > 0 ? Math.min(Math.round((expenses / effectiveBudget) * 100), 100) : 0;
+  const percentage = effectiveBudget > 0
+    ? Math.min(Math.round((expenses / effectiveBudget) * 100), 100)
+    : 0;
 
   const status =
     expenses > effectiveBudget ? "over"  :
@@ -37,10 +58,10 @@ export default function ExpenseCategoryCard({
     percentage >= 80           ? "almost": "ok";
 
   const statusConfig = {
-    ok:     { badge: "bg-green-50 text-green-800 border-green-200",  bar: "bg-[#97C459]", label: "OK"     },
-    almost: { badge: "bg-amber-50 text-amber-800 border-amber-200",  bar: "bg-[#FAC775]", label: "Almost" },
-    maxed:  { badge: "bg-red-50 text-red-800 border-red-200",        bar: "bg-[#FAC775]", label: "Max"    },
-    over:   { badge: "bg-red-100 text-red-900 border-red-300",       bar: "bg-[#E24B4A]", label: "Over"   },
+    ok:     { badge: "bg-green-50 text-green-800 border-green-200",  bar: "#97C459", label: "OK"     },
+    almost: { badge: "bg-amber-50 text-amber-800 border-amber-200",  bar: "#FAC775", label: "Almost" },
+    maxed:  { badge: "bg-red-50 text-red-800 border-red-200",        bar: "#FAC775", label: "Max"    },
+    over:   { badge: "bg-red-100 text-red-900 border-red-300",       bar: "#E24B4A", label: "Over"   },
   }[status];
 
   return (
@@ -69,25 +90,31 @@ export default function ExpenseCategoryCard({
         </div>
       </div>
 
-      {/* Progress bar */}
       <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-        <div
-          className={`h-1.5 rounded-full transition-all ${statusConfig.bar}`}
-          style={{ width: `${percentage}%` }}
+        <motion.div
+          className="h-1.5 rounded-full"
+          style={{ background: statusConfig.bar }}
+          initial={{ width: "0%" }}
+          animate={{ width: `${percentage}%` }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
         />
       </div>
 
       <div className="flex justify-between font-mono text-[11px] text-gray-500">
-        <span>€{expenses.toFixed(2)} spent</span>
-        <span>€{effectiveBudget.toFixed(2)} budget</span>
+        <span><AnimatedNumber value={expenses} /> spent</span>
+        <span><AnimatedNumber value={effectiveBudget} /> budget</span>
       </div>
 
       {income > 0 && (
-        <p className="font-mono text-[11px] text-[#3B6D11]">+€{income.toFixed(2)} income added</p>
+        <p className="font-mono text-[11px] text-[#3B6D11]">
+          +<AnimatedNumber value={income} /> income added
+        </p>
       )}
 
       {remaining < 0 && (
-        <p className="font-mono text-[11px] text-[#791F1F]">€{Math.abs(remaining).toFixed(2)} over budget</p>
+        <p className="font-mono text-[11px] text-[#791F1F]">
+          <AnimatedNumber value={Math.abs(remaining)} /> over budget
+        </p>
       )}
 
       <div className="flex justify-end">

@@ -61,23 +61,6 @@ export default function CategoryList({ budgetbookId, year, month }: Props) {
     onDrop: (e: React.DragEvent) => handleDrop(e, category),
   });
 
-  const addButton = (
-    <div className="flex justify-end mb-5">
-      <AddCategory budgetbookId={budgetbookId} />
-    </div>
-  );
-
-  if (categories.length === 0) {
-    return (
-      <>
-        {addButton}
-        <p className="font-mono text-sm text-gray-400 text-center py-12">
-          No categories yet. Add one to get started.
-        </p>
-      </>
-    );
-  }
-
   const renderCard = (category: Category) => {
     const isOver = overCategoryId === category.uid;
     const cardTransactions = transactionsForCategory(category);
@@ -101,25 +84,31 @@ export default function CategoryList({ budgetbookId, year, month }: Props) {
         <AddCategory budgetbookId={budgetbookId} />
       </div>
 
-      <div className="flex flex-col gap-8">
-        {incomeCategories.length > 0 && (
-          <section>
-            <p className="font-mono text-[11px] tracking-widest text-gray-400 uppercase mb-3">Income</p>
-            <div className="grid grid-cols-1 gap-3">
-              {incomeCategories.map(renderCard)}
-            </div>
-          </section>
-        )}
+      {categories.length === 0 ? (
+        <p className="font-mono text-sm text-gray-400 text-center py-12">
+          No categories yet. Add one to get started.
+        </p>
+      ) : (
+        <div className="flex flex-col gap-8">
+          {incomeCategories.length > 0 && (
+            <section>
+              <p className="font-mono text-[11px] tracking-widest text-gray-400 uppercase mb-3">Income</p>
+              <div className="grid grid-cols-1 gap-3">
+                {incomeCategories.map(renderCard)}
+              </div>
+            </section>
+          )}
 
-        {expenseCategories.length > 0 && (
-          <section>
-            <p className="font-mono text-[11px] tracking-widest text-gray-400 uppercase mb-3">Expenses</p>
-            <div className="grid grid-cols-1 gap-3">
-              {expenseCategories.map(renderCard)}
-            </div>
-          </section>
-        )}
-      </div>
+          {expenseCategories.length > 0 && (
+            <section>
+              <p className="font-mono text-[11px] tracking-widest text-gray-400 uppercase mb-3">Expenses</p>
+              <div className="grid grid-cols-1 gap-3">
+                {expenseCategories.map(renderCard)}
+              </div>
+            </section>
+          )}
+        </div>
+      )}
 
       <AnimatePresence>
         {editingCategory && (

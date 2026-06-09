@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Category, Transaction } from "../lib/schemas";
+import { useState, useEffect } from "react";
+import { motion } from "motion/react";
+import { Category, CategoryType, Transaction } from "../lib/schemas";
+import { changeCategory } from "../services/transaction-service";
 
 type Props = {
   transaction: Transaction;
@@ -19,14 +21,19 @@ export default function TransactionRow({ transaction, onEdit, categories }: Prop
   }, [transaction, category]);
 
   return (
-    <div
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: -6 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, x: -16 }}
+      transition={{ duration: 0.18, ease: "easeOut" }}
       draggable
-      onDragStart={(e) => e.dataTransfer.setData("transactionId", transaction.uid)}
+      onDragStart={(e) => (e as unknown as React.DragEvent).dataTransfer.setData("transactionId", transaction.uid)}
       className="group bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 flex items-center justify-between cursor-grab active:cursor-grabbing hover:border-gray-300 transition-colors"
     >
       <div className="flex items-center gap-4 min-w-0">
         <div
-          className="w-2 h-2 rounded-full shrink-0"
+          className="w-2 h-2 rounded-full flex-shrink-0"
           style={{ background: transaction.amount > 0 ? "#639922" : "#E24B4A" }}
         />
         <div className="min-w-0">
@@ -52,11 +59,11 @@ export default function TransactionRow({ transaction, onEdit, categories }: Prop
         </span>
         <button
           onClick={() => onEdit(transaction)}
-          className="border border-gray-200 rounded-lg px-3 py-1.5 font-mono text-[11px] text-gray-700 hover:border-gray-300 hover:text-gray-900 transition-colors"
+          className="border border-gray-200 rounded-lg px-3 py-1.5 font-mono text-[11px] text-gray-500 hover:border-gray-300 hover:text-gray-900 transition-colors"
         >
           Edit
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }
