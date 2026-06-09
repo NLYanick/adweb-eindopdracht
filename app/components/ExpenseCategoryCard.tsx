@@ -1,102 +1,99 @@
 import { Category, Transaction } from "../lib/schemas";
 
-
 interface ExpenseCategoryCardProps {
   category: Category;
   transactions: Transaction[];
   onEdit: (category: Category) => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDragLeave?: (e: React.DragEvent) => void;
+  onDrop?: (e: React.DragEvent) => void;
+  className?: string;
 }
 
 export default function ExpenseCategoryCard({
   category,
   transactions,
   onEdit,
+  onDragOver,
+  onDragLeave,
+  onDrop,
+  className = "",
 }: ExpenseCategoryCardProps) {
   const expenses = transactions
-    .filter((t) => t.amount < 0 && t.category === category.uid)
+    .filter(t => t.amount < 0 && t.category === category.uid)
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
   const income = transactions
-    .filter((t) => t.amount > 0 && t.category === category.uid)
-    .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    .filter(t => t.amount > 0 && t.category === category.uid)
+    .reduce((sum, t) => sum + t.amount, 0);
 
   const effectiveBudget = category.budget ? category.budget + income : income;
-  const remaining = effectiveBudget - expenses;
-  const percentage = Math.round((expenses / effectiveBudget) * 100);
+  const remaining  = effectiveBudget - expenses;
+  const percentage = effectiveBudget > 0 ? Math.min(Math.round((expenses / effectiveBudget) * 100), 100) : 0;
 
   const status =
-    percentage > 100 ? "over": percentage > 95 ? "maxed" : percentage >= 80 ? "almost" : "ok";
+    expenses > effectiveBudget ? "over"  :
+    percentage > 95            ? "maxed" :
+    percentage >= 80           ? "almost": "ok";
 
-  const statusStyles = {
-    ok: {
-      badge: "bg-green-100 text-green-800",
-      label: "OK",
-      bar: "bg-green-500",
-    },
-    almost: {
-      badge: "bg-yellow-100 text-yellow-800",
-      label: "Almost",
-      bar: "bg-yellow-400",
-    },
-    maxed: {
-      badge: "bg-red-100 text-red-800",
-      label: "Max",
-      bar: "bg-yellow-400",
-    },
-    over: {
-      badge: "bg-red-400 text-red-900",
-      label: "Over",
-      bar: "bg-red-500",
-    },
-  };
-
-  const style = statusStyles[status];
+  const statusConfig = {
+    ok:     { badge: "bg-green-50 text-green-800 border-green-200",  bar: "bg-[#97C459]", label: "OK"     },
+    almost: { badge: "bg-amber-50 text-amber-800 border-amber-200",  bar: "bg-[#FAC775]", label: "Almost" },
+    maxed:  { badge: "bg-red-50 text-red-800 border-red-200",        bar: "bg-[#FAC775]", label: "Max"    },
+    over:   { badge: "bg-red-100 text-red-900 border-red-300",       bar: "bg-[#E24B4A]", label: "Over"   },
+  }[status];
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-3">
+    <div
+      onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
+      onDrop={onDrop}
+      className={`bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-3 transition-colors ${className}`}
+    >
       <div className="flex justify-between items-start">
         <div>
           <p className="font-medium text-gray-900 text-sm">{category.name}</p>
-          <p className="text-xs text-gray-400 mt-0.5">
+          <p className="font-mono text-[10px] text-gray-400 mt-0.5">
             {category.endDate
               ? `Ends ${new Date(category.endDate).toLocaleDateString("en-US", { month: "short", year: "numeric" })}`
               : "No end date"}
           </p>
         </div>
         <div className="flex flex-col items-end gap-1">
-          <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700 font-medium">
+          <span className="font-mono text-[10px] tracking-wide px-2 py-0.5 rounded-full bg-red-50 text-red-800 border border-red-200">
             Expense
           </span>
-          <span className={`text-xs px-2 py-0.5 rounded-md font-medium ${style.badge}`}>
-            {style.label}
+          <span className={`font-mono text-[10px] tracking-wide px-2 py-0.5 rounded-full border ${statusConfig.badge}`}>
+            {statusConfig.label}
           </span>
         </div>
       </div>
 
-      <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+      {/* Progress bar */}
+      <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
         <div
-          className={`h-2 rounded-full transition-all ${style.bar}`}
+          className={`h-1.5 rounded-full transition-all ${statusConfig.bar}`}
           style={{ width: `${percentage}%` }}
         />
       </div>
 
-      <div className="flex justify-between text-xs text-gray-500">
+      <div className="flex justify-between font-mono text-[11px] text-gray-500">
         <span>€{expenses.toFixed(2)} spent</span>
         <span>€{effectiveBudget.toFixed(2)} budget</span>
       </div>
 
       {income > 0 && (
-        <p className="text-xs text-green-600">+€{income.toFixed(2)} income added</p>
+        <p className="font-mono text-[11px] text-[#3B6D11]">+€{income.toFixed(2)} income added</p>
       )}
 
       {remaining < 0 && (
-        <p className="text-xs text-red-500">€{Math.abs(remaining).toFixed(2)} over budget</p>
+        <p className="font-mono text-[11px] text-[#791F1F]">€{Math.abs(remaining).toFixed(2)} over budget</p>
       )}
 
-      <div className="flex gap-2 justify-end">
+      <div className="flex justify-end">
         <button
           onClick={() => onEdit(category)}
-          className="text-xs px-3 py-1 border border-gray-200 rounded-md hover:bg-gray-50 transition"
+          className="font-mono text-[11px] px-3 py-1.5 border border-gray-200 rounded-md text-gray-500 hover:border-gray-300 hover:text-gray-900 transition-colors"
         >
           Edit
         </button>

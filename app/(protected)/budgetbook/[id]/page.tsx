@@ -5,9 +5,6 @@ import { getBudgetBook } from "@/app/services/budgetbook-service";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Transaction } from "@/app/lib/schemas";
-import TransactionPanel from "@/app/components/TransactionsPanel";
-import CategoryList from "@/app/components/CategoryList";
 import { btn } from "@/app/lib/button";
 import {
   LineChart, Line, BarChart, Bar,
@@ -19,6 +16,8 @@ import TransactionsMonthNav from "@/app/components/TransactionsMonthNav";
 import { useCategoriesForMonth } from "@/app/hooks/useCategoriesByMonth";
 import BackButton from "@/app/components/BackButton";
 import { useTransactionsByMonth } from "@/app/hooks/useTransactionsByMonth";
+import TransactionPanel from "@/app/components/TransactionsPanel";
+import CategoryList from "@/app/components/CategoryList";
 
 export default function BudgetBookDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -32,9 +31,9 @@ export default function BudgetBookDetailPage() {
   const [year, setYear] = useState(now.getFullYear());
   const [debouncedMonth, setDebouncedMonth] = useState(month);
   const [debouncedYear, setDebouncedYear] = useState(year);
-  const [tab, setTab] = useState<"transactions" | "categories">("transactions");
-  
+
   const transactions = useTransactionsByMonth(id, debouncedYear, debouncedMonth);
+  const categories   = useCategoriesForMonth(id, debouncedYear, debouncedMonth);
 
   useEffect(() => {
     if (!user) return;
@@ -45,7 +44,6 @@ export default function BudgetBookDetailPage() {
       }
       setName(data.name);
       setDescription(data.description || "");
-      
     });
   }, [id, user]);
 
@@ -74,12 +72,8 @@ export default function BudgetBookDetailPage() {
   const income   = transactions.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0);
   const expenses = transactions.filter(t => t.amount < 0).reduce((s, t) => s + t.amount, 0);
 
-
-  const categories = useCategoriesForMonth(id, debouncedYear, debouncedMonth);
-
-  // Line chart data
+  // Line data
   type DayEntry = { day: number; income: number; expenses: number };
-
   const byDay = new Map<number, DayEntry>();
 
   for (const t of transactions) {
@@ -94,11 +88,9 @@ export default function BudgetBookDetailPage() {
 
   const lineData = Array.from(byDay.values()).sort((a, b) => a.day - b.day);
 
-  // Bar chart data
+  // Bar data
   type CategoryEntry = { category: string; amount: number };
-
   const byCategory: Record<string, number> = {};
-
   const categoryMap = Object.fromEntries(categories.map(c => [c.uid, c.name]));
 
   for (const t of transactions.filter(t => t.amount < 0)) {
@@ -111,9 +103,7 @@ export default function BudgetBookDetailPage() {
 
   return (
     <main className="p-20">
-
-      {/* Header */}
-      <div className="flex items-start justify-between mb-8">
+      <div className="flex items-start justify-between mb-2">
         <div>
           <h1 className="text-2xl font-medium tracking-tight text-gray-900">{name}</h1>
           {description && <p className="font-mono text-xs text-gray-400 mt-1">{description}</p>}
@@ -123,8 +113,8 @@ export default function BudgetBookDetailPage() {
 
       <BackButton href="/budgetbook" label="Back To Budget Books" />
 
-      {/* Charts */}
-      <p className="font-mono text-[11px] tracking-widest text-gray-400 uppercase mb-3">Overview</p>
+      <p className="font-mono text-[11px] tracking-widest text-gray-400 uppercase mb-3 mt-8">Overview</p>
+      
       <div className="grid grid-cols-2 gap-3 mb-6">
         <div className="bg-white border border-gray-200 rounded-xl p-4">
           <p className="font-mono text-[10px] tracking-widest text-gray-400 uppercase mb-3">
@@ -136,11 +126,12 @@ export default function BudgetBookDetailPage() {
               <XAxis dataKey="day" tick={{ fontFamily: "DM Mono", fontSize: 10 }} />
               <YAxis tick={{ fontFamily: "DM Mono", fontSize: 10 }} />
               <Legend wrapperStyle={{ fontFamily: "DM Mono", fontSize: 11 }} />
-              <Line type="monotone" dataKey="income" stroke="#639922" strokeWidth={1.5} dot={false} />
+              <Line type="monotone" dataKey="income"   stroke="#639922" strokeWidth={1.5} dot={false} />
               <Line type="monotone" dataKey="expenses" stroke="#E24B4A" strokeWidth={1.5} dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>
+        
         <div className="bg-white border border-gray-200 rounded-xl p-4">
           <p className="font-mono text-[10px] tracking-widest text-gray-400 uppercase mb-3">
             Expenses by category
@@ -160,22 +151,11 @@ export default function BudgetBookDetailPage() {
 
       <MetricsCards total={total} income={income} expenses={expenses} />
 
-      {/* Tabs */}
-      <div className="flex border-b border-gray-200 mb-5">
-        {(["transactions", "categories"] as const).map(t => (
-          <button key={t} onClick={() => setTab(t)}
-            className={`font-mono text-xs tracking-wide px-4 py-2.5 border-b-2 -mb-px transition-colors capitalize ${
-              tab === t
-                ? "border-gray-900 text-gray-900"
-                : "border-transparent text-gray-400 hover:text-gray-700"
-            }`}>
-            {t}
-          </button>
-        ))}
+      {/* Two-column layout — no tabs */}
+      <div className="grid grid-cols-2 gap-4 mt-6 items-start">
+        <TransactionPanel budgetbookId={id} month={month} year={year} />
+        <CategoryList     budgetbookId={id} month={month} year={year} />
       </div>
-
-      {tab === "transactions" && <TransactionPanel budgetbookId={id} month={month} year={year} />}
-      {tab === "categories"   && <CategoryList     budgetbookId={id} month={month} year={year} />}
     </main>
   );
 }
