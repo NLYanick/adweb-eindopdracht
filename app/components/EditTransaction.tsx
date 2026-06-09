@@ -71,17 +71,12 @@ export default function EditTransaction({ transaction, onClose, ref }: Props) {
 
                     <form onSubmit={onSubmit} className="flex flex-col gap-4">
                         <div className="flex rounded overflow-hidden border w-full">
-                            <button
-                                ref={ref}
-                                type="button"
-                                onClick={() => { setType("expense"); setCategoryId(""); }}
+                            <button ref={ref} type="button" onClick={() => { setType("expense"); setCategoryId(""); }}
                                 className={`px-6 py-2 text-sm font-medium transition-colors w-1/2 ${type === "expense" ? btn.danger : btn.clear}`}
                             >
                                 Expense
                             </button>
-                            <button
-                                type="button"
-                                onClick={() => { setType("income"); setCategoryId(""); }}
+                            <button type="button" onClick={() => { setType("income"); setCategoryId(""); }}
                                 className={`px-6 py-2 text-sm font-medium transition-colors w-1/2 ${type === "income" ? btn.success : btn.clear}`}
                             >
                                 Income
@@ -132,28 +127,11 @@ export default function EditTransaction({ transaction, onClose, ref }: Props) {
                             onChange={(e) => setDate(e.target.value)}
                         />
 
-                        <div className="flex gap-2 justify-between">
-                            <button
-                                type="button"
-                                onClick={() => setShowDelete(true)}
-                                className={btn.danger}
-                            >
-                                Delete
-                            </button>
+                        <div className="flex justify-between gap-2">
+                            <button type="button" onClick={() => setShowDelete(true)} className={btn.danger}>Delete</button>
                             <div className="flex gap-2">
-                                <button
-                                    type="button"
-                                    onClick={() => onClose()}
-                                    className={btn.secondary}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className={btn.primary}
-                                >
-                                    Save
-                                </button>
+                                <button type="button" onClick={onClose} className={btn.secondary}>Cancel</button>
+                                <button type="submit" className={btn.primary}>Save</button>
                             </div>
                         </div>
                     </form>
@@ -180,20 +158,8 @@ export default function EditTransaction({ transaction, onClose, ref }: Props) {
                             <h2 className="text-xl font-bold">Delete Transaction</h2>
                             <p className="text-gray-600">Are you sure you want to delete this transaction? This cannot be undone.</p>
                             <div className="flex gap-2 justify-end">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowDelete(false)}
-                                    className={btn.secondary}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={removeTransaction}
-                                    className={btn.danger}
-                                >
-                                    Delete
-                                </button>
+                                <button type="button" onClick={() => setShowDelete(false)} className={btn.secondary}>Cancel</button>
+                                <button type="button" onClick={removeTransaction} className={btn.danger}>Delete</button>
                             </div>
                         </motion.div>
                     </motion.div>

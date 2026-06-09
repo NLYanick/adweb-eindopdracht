@@ -8,7 +8,7 @@ import { watchUsers } from "@/app/services/user-service";
 import { Budgetbook, UserProfile } from "@/app/lib/schemas";
 import SearchableDropdown from "@/app/components/SearchableDropdown";
 import { btn } from "@/app/lib/button";
-import { AnimatePresence } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import ArchiveModal from "@/app/components/ArchiveModal";
 import SharedWithRow from "@/app/components/SharedWithRow";
 import RemoveInvitedModal from "@/app/components/RemoveInvitedModal";
@@ -59,7 +59,7 @@ export default function EditBudgetBookPage() {
                 .filter(u => u.uid !== user?.uid)
                 .filter(u => u.uid !== budgetBook?.owner)
                 .filter(u => !budgetBook?.sharedWith?.includes(u.uid));
-            
+
             setFilteredUsers(filteredUsers.slice(0, 15));
             setUsers(users);
         });
@@ -104,12 +104,22 @@ export default function EditBudgetBookPage() {
 
     return (
         <main className="p-20">
-            <header className="mb-8">
-                <h1 className="text-2xl font-medium tracking-tight text-gray-900">Edit budget book</h1>
+            <motion.header
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="mb-8"
+            >
+                <h1 className="text-2xl font-medium tracking-tight text-gray-900">Edit Budget Book</h1>
                 <p className="text-xs font-mono text-gray-400 mt-1">{name}</p>
-            </header>
+            </motion.header>
 
-            <section className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+            <motion.section
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="bg-white border border-gray-200 rounded-xl p-6 mb-6"
+            >
                 <h2 className="text-sm font-mono tracking-widest text-gray-400 uppercase mb-5">Information</h2>
                 <form onSubmit={onSubmit} className="flex flex-col gap-5">
                     <div>
@@ -136,9 +146,14 @@ export default function EditBudgetBookPage() {
                         </div>
                     </div>
                 </form>
-            </section>
+            </motion.section>
 
-            <section className="bg-white border border-gray-200 rounded-xl p-6">
+            <motion.section
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="bg-white border border-gray-200 rounded-xl p-6"
+            >
                 <h2 className="text-sm font-mono tracking-widest text-gray-400 uppercase mb-5">Share with others</h2>
                 <div className="flex gap-2 items-start">
                     <div className="flex-1 space-y-2">
@@ -169,23 +184,23 @@ export default function EditBudgetBookPage() {
                         )
                     })}
                 </ul>
-            </section>
+            </motion.section>
 
             <AnimatePresence>
                 {showArchiveModal && (
-                    <ArchiveModal 
-                        name={name} 
-                        onCancel={() => setShowArchiveModal(false)} 
-                        onConfirm={handleArchive} 
+                    <ArchiveModal
+                        name={name}
+                        onCancel={() => setShowArchiveModal(false)}
+                        onConfirm={handleArchive}
                     />
                 )}
             </AnimatePresence>
             <AnimatePresence>
                 {showRemoveModal && (
-                    <RemoveInvitedModal 
-                        name={removingUser?.name || ""} 
-                        onCancel={() => setShowRemoveModal(false)} 
-                        onConfirm={handleRemoveInvited} 
+                    <RemoveInvitedModal
+                        name={removingUser?.name || ""}
+                        onCancel={() => setShowRemoveModal(false)}
+                        onConfirm={handleRemoveInvited}
                     />
                 )}
             </AnimatePresence>

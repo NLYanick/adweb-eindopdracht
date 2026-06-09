@@ -40,7 +40,6 @@ export default function EditCategory({ category, onClose, ref }: Props) {
 
     return (
         <div>
-
             <motion.div
                 onClick={onClose}
                 initial={{ opacity: 0 }}
@@ -61,17 +60,12 @@ export default function EditCategory({ category, onClose, ref }: Props) {
 
                     <form onSubmit={onSubmit} className="flex flex-col gap-4">
                         <div className="flex rounded overflow-hidden border w-full">
-                            <button
-                                ref={ref}
-                                type="button"
-                                onClick={() => setType(CategoryType.Expense)}
+                            <button ref={ref} type="button" onClick={() => setType(CategoryType.Expense)}
                                 className={`px-6 py-2 text-sm font-medium transition-colors w-1/2 ${type === CategoryType.Expense ? btn.danger : btn.clear}`}
                             >
                                 Expense
                             </button>
-                            <button
-                                type="button"
-                                onClick={() => setType(CategoryType.Income)}
+                            <button type="button" onClick={() => setType(CategoryType.Income)}
                                 className={`px-6 py-2 text-sm font-medium transition-colors w-1/2 ${type === CategoryType.Income ? btn.success : btn.clear}`}
                             >
                                 Income
@@ -113,27 +107,10 @@ export default function EditCategory({ category, onClose, ref }: Props) {
                         </div>
 
                         <div className="flex justify-between gap-2">
-                            <button
-                                type="button"
-                                onClick={() => setShowDelete(true)}
-                                className={btn.danger}
-                            >
-                                Delete
-                            </button>
+                            <button type="button" onClick={() => setShowDelete(true)} className={btn.danger}>Delete</button>
                             <div className="flex gap-2">
-                                <button
-                                    type="button"
-                                    onClick={onClose}
-                                    className={btn.secondary}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className={btn.primary}
-                                >
-                                    Save
-                                </button>
+                                <button type="button" onClick={onClose} className={btn.secondary}>Cancel</button>
+                                <button type="submit" className={btn.primary}>Save</button>
                             </div>
                         </div>
                     </form>
@@ -160,20 +137,8 @@ export default function EditCategory({ category, onClose, ref }: Props) {
                             <h2 className="text-xl font-bold">Delete Category</h2>
                             <p className="text-gray-600">Are you sure you want to delete this category? This cannot be undone.</p>
                             <div className="flex gap-2 justify-end">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowDelete(false)}
-                                    className={btn.secondary}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={removeCategory}
-                                    className={btn.danger}
-                                >
-                                    Delete
-                                </button>
+                                <button type="button" onClick={() => setShowDelete(false)} className={btn.secondary}>Cancel</button>
+                                <button type="button" onClick={removeCategory} className={btn.danger}>Delete</button>
                             </div>
                         </motion.div>
                     </motion.div>

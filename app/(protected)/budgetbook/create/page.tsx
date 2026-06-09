@@ -2,6 +2,7 @@
 import { useAuth } from "@/app/context/AuthContext";
 import { btn } from "@/app/lib/button";
 import { createBudgetBook } from "@/app/services/budgetbook-service";
+import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -25,12 +26,22 @@ export default function New() {
 
   return (
     <main className="p-20">
-      <header className="mb-8">
+      <motion.header 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="mb-8"
+      >
         <h1 className="text-2xl font-medium tracking-tight text-gray-900">Create New Budget Book</h1>
         <p className="text-xs font-mono text-gray-400 mt-1">{name}</p>
-      </header>
+      </motion.header>
 
-      <section className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+      <motion.section 
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="bg-white border border-gray-200 rounded-xl p-6 mb-6"
+      >
         <form onSubmit={onSubmit} className="flex flex-col gap-5">
           <div>
             <label className="block text-sm font-mono text-gray-500 mb-1.5" htmlFor="name">Name</label>
@@ -51,7 +62,7 @@ export default function New() {
             <button type="submit" className={btn.primary}>Create Budget Book</button>
           </div>
         </form>
-      </section>
+      </motion.section>
     </main>
   );
 }

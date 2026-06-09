@@ -20,6 +20,7 @@ export default function IncomeCategoryCard({
   onDrop,
   className = "",
 }: IncomeCategoryCardProps) {
+  
   const totalIncome = transactions
     .filter(t => t.amount > 0 && t.category === category.uid)
     .reduce((sum, t) => sum + t.amount, 0);

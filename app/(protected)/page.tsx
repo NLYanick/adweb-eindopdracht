@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
 import { btn } from "../lib/button";
+import { motion } from "motion/react";
 
 export default function Home() {
   const { user } = useAuth();
@@ -11,7 +12,12 @@ export default function Home() {
     <main className="min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto px-8 py-24">
 
-        <header className="mb-16">
+        <motion.header 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="mb-16"
+        >
           <p className="font-mono text-[11px] tracking-widest text-gray-400 uppercase mb-3">
             Personal Finance
           </p>
@@ -30,16 +36,21 @@ export default function Home() {
             . Track income, categorize expenses, and understand where
             your money goes with a simple and focused budgeting system.
           </p>
-        </header>
+        </motion.header>
 
-        <section className="flex gap-3 mb-16">
+        <motion.section 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="flex gap-3 mb-16"
+        >
           <Link
             href="/budgetbook"
             className={btn.success}
           >
             Open Budget Books
           </Link>
-        </section>
+        </motion.section>
       </div>
     </main>
   );

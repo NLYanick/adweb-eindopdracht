@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { animate, motion } from "motion/react";
+import { useRef } from "react";
+import { motion } from "motion/react";
 import { Category, Transaction } from "../lib/schemas";
+import AnimatedNumber from "./AnimatedNumber";
+import { useExpenseCardData } from "../hooks/useExpenseCardData";
 
 interface ExpenseCategoryCardProps {
   category: Category;
@@ -10,23 +12,6 @@ interface ExpenseCategoryCardProps {
   onDragLeave?: (e: React.DragEvent) => void;
   onDrop?: (e: React.DragEvent) => void;
   className?: string;
-}
-
-function AnimatedNumber({ value, prefix = "€" }: { value: number; prefix?: string }) {
-  const [display, setDisplay] = useState(value);
-  const prevRef = useRef(value);
-
-  useEffect(() => {
-    const controls = animate(prevRef.current, value, {
-      duration: 0.4,
-      ease: "easeOut",
-      onUpdate: (v) => setDisplay(v),
-    });
-    prevRef.current = value;
-    return () => controls.stop();
-  }, [value]);
-
-  return <span>{prefix}{display.toFixed(2)}</span>;
 }
 
 export default function ExpenseCategoryCard({
@@ -40,19 +25,7 @@ export default function ExpenseCategoryCard({
 }: ExpenseCategoryCardProps) {
   const editButtonRef = useRef<HTMLButtonElement>(null);
 
-  const expenses = transactions
-    .filter(t => t.amount < 0 && t.category === category.uid)
-    .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-
-  const income = transactions
-    .filter(t => t.amount > 0 && t.category === category.uid)
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const effectiveBudget = category.budget ? category.budget + income : income;
-  const remaining  = effectiveBudget - expenses;
-  const percentage = effectiveBudget > 0
-    ? Math.min(Math.round((expenses / effectiveBudget) * 100), 100)
-    : 0;
+  const { expenses, income, effectiveBudget, remaining, percentage } = useExpenseCardData(transactions, category);
 
   const status =
     expenses > effectiveBudget ? "over"  :

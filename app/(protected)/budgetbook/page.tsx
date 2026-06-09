@@ -23,7 +23,12 @@ export default function Home() {
 
   return (
     <main className="p-20">
-      <div className="flex items-start justify-between mb-8">
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="flex items-start justify-between mb-8"
+      >
         <header>
           <AnimatePresence mode="wait" initial={false}>
             <motion.h1
@@ -59,7 +64,7 @@ export default function Home() {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </motion.div>
 
       <section>
         <AnimatePresence mode="wait">
