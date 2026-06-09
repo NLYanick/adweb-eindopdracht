@@ -5,6 +5,7 @@ import TransactionRow from "./TransactionRow";
 import EditTransaction from "./EditTransaction";
 import { useTransactionsByMonth } from "../hooks/useTransactionsByMonth";
 import { useCategoriesForMonth } from "../hooks/useCategoriesByMonth";
+import { AnimatePresence } from "motion/react";
 
 type Props = {
   budgetbookId: string;
@@ -14,7 +15,7 @@ type Props = {
 
 export default function TransactionPanel({ budgetbookId, month, year }: Props) {
   const transactions = useTransactionsByMonth(budgetbookId, year, month);
-  const categories   = useCategoriesForMonth(budgetbookId, year, month);
+  const categories = useCategoriesForMonth(budgetbookId, year, month);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const typeRef = useRef<HTMLButtonElement>(null);
 
@@ -22,7 +23,7 @@ export default function TransactionPanel({ budgetbookId, month, year }: Props) {
     if (editingTransaction) typeRef.current?.focus();
   }, [editingTransaction]);
 
-  const categorised   = transactions.filter(t => t.category);
+  const categorised = transactions.filter(t => t.category);
   const uncategorised = transactions.filter(t => !t.category);
 
   const sorted = (list: Transaction[]) =>
@@ -76,13 +77,15 @@ export default function TransactionPanel({ budgetbookId, month, year }: Props) {
         </div>
       )}
 
-      {editingTransaction && (
-        <EditTransaction
-          transaction={editingTransaction}
-          onClose={() => setEditingTransaction(null)}
-          ref={typeRef}
-        />
-      )}
+      <AnimatePresence>
+        {editingTransaction && (
+          <EditTransaction
+            transaction={editingTransaction}
+            onClose={() => setEditingTransaction(null)}
+            ref={typeRef}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

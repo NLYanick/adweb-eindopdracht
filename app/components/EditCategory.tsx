@@ -4,6 +4,7 @@ import { deleteCategory, updateCategory } from "@/app/services/category-service"
 import { useState } from "react";
 import { btn } from "../lib/button";
 import { Category, CategoryType } from "../lib/schemas";
+import { AnimatePresence, motion } from "motion/react";
 
 type Props = {
     category: Category;
@@ -39,8 +40,23 @@ export default function EditCategory({ category, onClose, ref }: Props) {
 
     return (
         <div>
-            <div onClick={onClose} className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                <div onClick={(e) => e.stopPropagation()} className="bg-white text-black rounded-lg p-6 w-full max-w-md flex flex-col gap-4">
+
+            <motion.div
+                onClick={onClose}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+            >
+                <motion.div
+                    onClick={(e) => e.stopPropagation()}
+                    initial={{ opacity: 0, y: 12, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 12, scale: 0.97 }}
+                    transition={{ duration: 0.22, ease: "easeOut" }}
+                    className="bg-white text-black rounded-xl p-6 w-full max-w-md flex flex-col gap-4"
+                >
                     <h2 className="text-xl font-bold">Edit Category</h2>
 
                     <form onSubmit={onSubmit} className="flex flex-col gap-4">
@@ -121,39 +137,48 @@ export default function EditCategory({ category, onClose, ref }: Props) {
                             </div>
                         </div>
                     </form>
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
 
-            {showDelete && (
-                <div
-                    className="fixed inset-0 bg-black/60 flex items-center justify-center z-60"
-                    onClick={() => setShowDelete(false)}
-                >
-                    <div
-                        className="bg-white rounded-lg p-6 w-full max-w-sm flex flex-col gap-4"
-                        onClick={(e) => e.stopPropagation()}
+            <AnimatePresence>
+                {showDelete && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/60 flex items-center justify-center z-60"
+                        onClick={() => setShowDelete(false)}
                     >
-                        <h2 className="text-xl font-bold">Delete Category</h2>
-                        <p className="text-gray-600">Are you sure you want to delete this category? This cannot be undone.</p>
-                        <div className="flex gap-2 justify-end">
-                            <button
-                                type="button"
-                                onClick={() => setShowDelete(false)}
-                                className={btn.secondary}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="button"
-                                onClick={removeCategory}
-                                className={btn.danger}
-                            >
-                                Delete
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.92 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.92 }}
+                            transition={{ duration: 0.18, ease: "easeOut" }}
+                            className="bg-white rounded-lg p-6 w-full max-w-sm flex flex-col gap-4"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <h2 className="text-xl font-bold">Delete Category</h2>
+                            <p className="text-gray-600">Are you sure you want to delete this category? This cannot be undone.</p>
+                            <div className="flex gap-2 justify-end">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowDelete(false)}
+                                    className={btn.secondary}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={removeCategory}
+                                    className={btn.danger}
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

@@ -7,6 +7,7 @@ import ExpenseCategoryCard from "./ExpenseCategoryCard";
 import IncomeCategoryCard from "./IncomeCategoryCard";
 import EditCategory from "./EditCategory";
 import { changeCategory } from "../services/transaction-service";
+import { AnimatePresence } from "motion/react";
 
 interface Props {
   budgetbookId: string;
@@ -19,12 +20,12 @@ export default function CategoryList({ budgetbookId, year, month }: Props) {
   const [overCategoryId, setOverCategoryId] = useState<string | null>(null);
 
   const transactions = useTransactionsByMonth(budgetbookId, year, month);
-  const categories   = useCategoriesForMonth(budgetbookId, year, month);
+  const categories = useCategoriesForMonth(budgetbookId, year, month);
 
-  const incomeCategories  = categories.filter(c => c.type === CategoryType.Income);
+  const incomeCategories = categories.filter(c => c.type === CategoryType.Income);
   const expenseCategories = categories.filter(c => c.type === CategoryType.Expense);
 
-  const typeRef   = useRef<HTMLButtonElement>(null);
+  const typeRef = useRef<HTMLButtonElement>(null);
   const returnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -46,7 +47,7 @@ export default function CategoryList({ budgetbookId, year, month }: Props) {
 
     // Type guard: only allow income on income categories, expenses on expense categories
     const isCompatible =
-      (category.type === CategoryType.Income  && transaction.amount > 0) ||
+      (category.type === CategoryType.Income && transaction.amount > 0) ||
       (category.type === CategoryType.Expense && transaction.amount < 0);
 
     if (!isCompatible) return;
@@ -55,9 +56,9 @@ export default function CategoryList({ budgetbookId, year, month }: Props) {
   };
 
   const dropHandlers = (category: Category) => ({
-    onDragOver:  (e: React.DragEvent) => { e.preventDefault(); setOverCategoryId(category.uid); },
+    onDragOver: (e: React.DragEvent) => { e.preventDefault(); setOverCategoryId(category.uid); },
     onDragLeave: () => setOverCategoryId(null),
-    onDrop:      (e: React.DragEvent) => handleDrop(e, category),
+    onDrop: (e: React.DragEvent) => handleDrop(e, category),
   });
 
   const addButton = (
@@ -89,7 +90,7 @@ export default function CategoryList({ budgetbookId, year, month }: Props) {
     };
 
     return category.type === CategoryType.Income
-      ? <IncomeCategoryCard  key={category.uid} {...commonProps} />
+      ? <IncomeCategoryCard key={category.uid} {...commonProps} />
       : <ExpenseCategoryCard key={category.uid} {...commonProps} />;
   };
 
@@ -120,13 +121,15 @@ export default function CategoryList({ budgetbookId, year, month }: Props) {
         )}
       </div>
 
-      {editingCategory && (
-        <EditCategory
-          ref={typeRef}
-          category={editingCategory}
-          onClose={() => setEditingCategory(null)}
-        />
-      )}
+      <AnimatePresence>
+        {editingCategory && (
+          <EditCategory
+            ref={typeRef}
+            category={editingCategory}
+            onClose={() => setEditingCategory(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
