@@ -81,13 +81,15 @@ export default function TransactionPanel({ budgetbookId, month, year }: Props) {
         </div>
       )}
 
-      {editingTransaction && (
-        <EditTransaction
-          transaction={editingTransaction}
-          onClose={() => setEditingTransaction(null)}
-          ref={typeRef}
-        />
-      )}
+      <AnimatePresence>
+        {editingTransaction && (
+          <EditTransaction
+            transaction={editingTransaction}
+            onClose={() => setEditingTransaction(null)}
+            ref={typeRef}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

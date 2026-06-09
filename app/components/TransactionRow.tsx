@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { Category, CategoryType, Transaction } from "../lib/schemas";
-import { changeCategory } from "../services/transaction-service";
+import { Category, Transaction } from "../lib/schemas";
 
 type Props = {
   transaction: Transaction;
@@ -20,6 +19,10 @@ export default function TransactionRow({ transaction, onEdit, categories }: Prop
     if (!transaction.category && category) setCategory(null);
   }, [transaction, category]);
 
+  useEffect(() => {
+    setCategory(categories.find(c => c.uid === transaction.category) ?? null);
+  }, [categories]);
+
   return (
     <motion.div
       layout
@@ -32,8 +35,8 @@ export default function TransactionRow({ transaction, onEdit, categories }: Prop
       className="group bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 flex items-center justify-between cursor-grab active:cursor-grabbing hover:border-gray-300 transition-colors"
     >
       <div className="flex items-center gap-4 min-w-0">
-        <div
-          className="w-2 h-2 rounded-full flex-shrink-0"
+        <div 
+          className="w-2 h-2 rounded-full shrink-0"
           style={{ background: transaction.amount > 0 ? "#639922" : "#E24B4A" }}
         />
         <div className="min-w-0">
@@ -55,7 +58,7 @@ export default function TransactionRow({ transaction, onEdit, categories }: Prop
 
       <div className="flex items-center gap-3 shrink-0">
         <span className={`font-medium text-sm ${transaction.amount > 0 ? "text-[#639922]" : "text-[#E24B4A]"}`}>
-          {transaction.amount > 0 ? "+" : "−"}€{Math.abs(transaction.amount).toFixed(2)}
+          {transaction.amount > 0 ? "+" : "−"} €{Math.abs(transaction.amount).toFixed(2)}
         </span>
         <button
           onClick={() => onEdit(transaction)}
