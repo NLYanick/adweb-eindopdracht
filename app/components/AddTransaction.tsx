@@ -60,6 +60,7 @@ export default function AddTransaction({ id, className }: Props) {
     return (
         <div className={className ?? ""} onClick={() => setShow(false)}>
             <button
+                data-testid="add-transaction-modal-button"
                 onClick={(e) => { setShow(true); e.stopPropagation() }}
                 className={btn.primary}
             >
@@ -69,6 +70,7 @@ export default function AddTransaction({ id, className }: Props) {
             <AnimatePresence>
                 {show && (
                     <motion.div
+                        data-testid="add-transaction-modal"
                         key="add-category-backdrop"
                         onClick={() => setShow(false)}
                         initial={{ opacity: 0 }}

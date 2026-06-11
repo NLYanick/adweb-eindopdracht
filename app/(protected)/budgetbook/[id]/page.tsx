@@ -110,7 +110,7 @@ export default function BudgetBookDetailPage() {
       <section>
         <TransactionsMonthNav monthLabel={monthLabel} prevMonth={prevMonth} nextMonth={nextMonth} />
 
-        <MetricsCards total={total} income={income} expenses={expenses} />
+        <MetricsCards income={income} expenses={expenses} />
       </section>
 
       <section className="grid grid-cols-2 gap-4 mt-6 items-start">

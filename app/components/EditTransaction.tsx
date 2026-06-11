@@ -32,7 +32,7 @@ export default function EditTransaction({ transaction, onClose, ref }: Props) {
         (!c.endDate || c.endDate >= date)
     );
 
-    const onSubmit = async (e: React.FormEvent) => {
+    const onSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
         await updateTransaction(transaction.uid, {
             budgetbook: transaction.budgetbook,

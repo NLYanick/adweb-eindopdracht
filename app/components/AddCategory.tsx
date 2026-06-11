@@ -48,6 +48,7 @@ export default function AddCategory({ budgetbookId, className }: Props) {
     return (
         <div className={className ?? ""}>
             <button
+                data-testid="add-category-modal-button"
                 onClick={() => setShow(true)}
                 className={btn.primary}
             >
@@ -57,6 +58,7 @@ export default function AddCategory({ budgetbookId, className }: Props) {
             <AnimatePresence>
                 {show && (
                     <motion.div
+                        data-testid="add-category-modal"
                         key="add-category-backdrop"
                         onClick={() => setShow(false)}
                         initial={{ opacity: 0 }}

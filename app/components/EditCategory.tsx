@@ -19,7 +19,7 @@ export default function EditCategory({ category, onClose, ref }: Props) {
     const [budget, setBudget] = useState(category.budget?.toString());
     const [endDate, setEndDate] = useState(category.endDate ?? "");
 
-    const onSubmit = async (e: React.FormEvent) => {
+    const onSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
 
         await updateCategory(category.uid, {
@@ -138,7 +138,7 @@ export default function EditCategory({ category, onClose, ref }: Props) {
                             <p className="text-gray-600">Are you sure you want to delete this category? This cannot be undone.</p>
                             <div className="flex gap-2 justify-end">
                                 <button type="button" onClick={() => setShowDelete(false)} className={btn.secondary}>Cancel</button>
-                                <button type="button" onClick={removeCategory} className={btn.danger}>Delete</button>
+                                <button data-testid="delete-category-modal" type="button" onClick={removeCategory} className={btn.danger}>Delete</button>
                             </div>
                         </motion.div>
                     </motion.div>
