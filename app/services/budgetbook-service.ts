@@ -28,6 +28,20 @@ export function watchBudgetBooks(userId: string, showArchived:boolean,callback: 
     return unsubscribe;
 }
 
+export function watchBudgetBook(id: string, callback: (book: Budgetbook | null) => void) {
+    const bookRef = doc(db, "budgetbooks", id); // Adjust path to match your setup
+
+    const unsubscribe = onSnapshot(bookRef, (snapshot) => {
+        if (snapshot.exists()) {
+            callback({ uid: snapshot.id, ...snapshot.data() } as Budgetbook);
+        } else {
+            callback(null);
+        }
+    });
+
+    return unsubscribe;
+}
+
 export async function getBudgetBook(id: string): Promise<Budgetbook | null> {
     const docRef = doc(db, "budgetbooks", id);
     const docSnap = await getDoc(docRef);

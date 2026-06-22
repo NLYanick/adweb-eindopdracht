@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { updateBudgetBook, getBudgetBook, archiveBudgetBook, shareBudgetBook, unshareBudgetBook } from "@/app/services/budgetbook-service";
+import { updateBudgetBook, getBudgetBook, archiveBudgetBook, shareBudgetBook, unshareBudgetBook, watchBudgetBook } from "@/app/services/budgetbook-service";
 import { useAuth } from "@/app/context/AuthContext";
 import { watchUsers } from "@/app/services/user-service";
 import { Budgetbook, UserProfile } from "@/app/lib/schemas";
@@ -21,6 +21,7 @@ export default function EditBudgetBookPage() {
     const [budgetBook, setBudgetBook] = useState<Budgetbook | null>(null);
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
+    const [originalName, setOriginalName] = useState("");
 
     const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
     const [removingUser, setRemovingUser] = useState<UserProfile | null>(null);
@@ -30,42 +31,41 @@ export default function EditBudgetBookPage() {
     const [showArchiveModal, setShowArchiveModal] = useState(false);
     const [showRemoveModal, setShowRemoveModal] = useState(false);
 
-    const loadBudgetBook = async () => {
-        const book = await getBudgetBook(id as string);
-
-        if (!book || book.archived == true) {
-            router.push(`/budgetbook/${id}`);
-            return;
-        }
-        if (book.owner !== user?.uid && !book.sharedWith?.includes(user?.uid || "")) {
-            router.push(`/budgetbook/${id}`);
-            return;
-        }
-
-        setBudgetBook(book);
-        setName(book.name);
-        setDescription(book.description || "");
-    }
-
-    // Effects
     useEffect(() => {
-        if (!user) return;
-        loadBudgetBook();
-    }, [id, user, router, budgetBook?.sharedWith]);
+        if (!user || !id) return;
+
+        const unsubscribe = watchBudgetBook(id as string, (book) => {
+            if (!book || book.archived) {
+                router.push(`/budgetbook/${id}`);
+                return;
+            }
+            if (book.owner !== user?.uid && !book.sharedWith?.includes(user?.uid || "")) {
+                router.push(`/budgetbook/${id}`);
+                return;
+            }
+
+            setBudgetBook(book);
+            setName((prev) => prev === "" ? book.name : prev);
+            setDescription((prev) => prev === "" ? (book.description || "") : prev);
+            setOriginalName(book.name);
+        });
+
+        return () => unsubscribe();
+    }, [id, user, router]);
 
     useEffect(() => {
-        const unsubscribe = watchUsers((users) => {
-            const filteredUsers = users
+        const unsubscribe = watchUsers((fetchedUsers) => {
+            const filtered = fetchedUsers
                 .filter(u => u.uid !== user?.uid)
                 .filter(u => u.uid !== budgetBook?.owner)
                 .filter(u => !budgetBook?.sharedWith?.includes(u.uid));
 
-            setFilteredUsers(filteredUsers.slice(0, 15));
-            setUsers(users);
+            setFilteredUsers(filtered.slice(0, 15));
+            setUsers(fetchedUsers);
         });
 
         return () => unsubscribe();
-    }, [id, budgetBook?.sharedWith]);
+    }, [user, budgetBook]);
 
     // Handlers
     const onSubmit = async (e: React.SubmitEvent) => {
@@ -111,7 +111,7 @@ export default function EditBudgetBookPage() {
                 className="mb-8"
             >
                 <h1 className="text-2xl font-medium tracking-tight text-gray-900">Edit Budget Book</h1>
-                <p className="text-xs font-mono text-gray-400 mt-1">{name}</p>
+                <p className="text-xs font-mono text-gray-400 mt-1">{originalName}</p>
             </motion.header>
 
             <motion.section
@@ -189,7 +189,7 @@ export default function EditBudgetBookPage() {
             <AnimatePresence>
                 {showArchiveModal && (
                     <ArchiveModal
-                        name={name}
+                        name={originalName}
                         onCancel={() => setShowArchiveModal(false)}
                         onConfirm={handleArchive}
                     />
