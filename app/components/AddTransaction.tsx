@@ -155,6 +155,8 @@ export default function AddTransaction({ id, className }: Props) {
                                     className="border p-2 rounded"
                                     value={date}
                                     onChange={(e) => setDate(e.target.value)}
+                                    required
+                                    min="1950-01-01"
                                 />
 
                                 <div className="flex gap-2 justify-end">

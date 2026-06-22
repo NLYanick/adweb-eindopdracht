@@ -10,9 +10,9 @@ const AuthContext = createContext<AuthContextType | null>(null);
 type AuthContextType = {
   user: UserProfile | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
-  register: (email: string, password: string, name: string) => Promise<boolean>;
+  register: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
 };
 
 // This component will wrap our entire app and provide the authenticated user and functions to all child components
@@ -27,7 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(false);
         return;
       }
-      
+
       if (user) {
         setLoading(false);
         return;
@@ -43,17 +43,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   async function login(email: string, password: string) {
-    const { user } = await signInWithEmailAndPassword(auth, email, password);
-    
-    if(!user) return false;
+    try {
+      const { user } = await signInWithEmailAndPassword(auth, email, password);
+      if (!user) return { success: false, error: "Invalid email or password." };
 
-    setUser({
-      uid: user.uid,
-      email: user.email || "",
-      name: user.displayName || ""
-    });
+      setUser({
+        uid: user.uid,
+        email: user.email || "",
+        name: user.displayName || ""
+      });
 
-    return true;
+      return { success: true };
+    } catch (e) {
+      console.error("Login error:", e);
+      return { success: false, error: "Invalid email or password." };
+    }
   }
 
   async function logout() {
@@ -62,25 +66,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function register(email: string, password: string, name: string) {
-    const { user } = await createUserWithEmailAndPassword(auth, email, password);
-    if(!user) return false;
-    await updateProfile(user, { displayName: name });
+    try {
+      const { user } = await createUserWithEmailAndPassword(auth, email, password);
+      if (!user) return { success: false, error: "Failed to create user. Please try different credentials." };
+      
+      await updateProfile(user, { displayName: name });
 
-    const newUser = await createUser({
-      uid: user.uid,
-      email: user.email || "",
-      name: name
-    });
-    
-    // if(!newUser) return false;
-    
-    setUser({
-      uid: user.uid,
-      email: user.email || "",
-      name: name
-    });
+      await createUser({
+        uid: user.uid,
+        email: user.email || "",
+        name: name
+      });
 
-    return true;
+      setUser({
+        uid: user.uid,
+        email: user.email || "",
+        name: name
+      });
+
+      return { success: true };
+    } catch (e) {
+      console.error("Registration error:", e);
+      return { success: false, error: "Failed to create user. Please try different credentials." };
+    }
   }
 
   return (
@@ -92,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  
+
   if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 };
