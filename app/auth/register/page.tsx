@@ -28,7 +28,7 @@ export default function RegisterPage() {
     }
 
     const isRegistered = await register(email, password, name);
-    
+     
     if (isRegistered) router.push("/");
     else setError("Registration failed. Please try again.");
   };
