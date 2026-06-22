@@ -26,10 +26,10 @@ export default function LoginPage() {
       return;
     }
 
-    const isLogged = await login(email, password);
+    const { success, error } = await login(email, password);
     
-    if (isLogged) router.push("/");
-    else setError("Login failed. Please try again.");
+    if (success) router.push("/");
+    else setError(error || "Login failed. Please try again.");
   };
 
   return (
@@ -70,7 +70,7 @@ export default function LoginPage() {
               className={btn.primary + " mt-2 py-3"}>
               Login
             </button>
-            {error && <p className="text-red-500 text-sm font-mono">{error}</p>}
+            {error && <p className="text-red-500 text-sm font-mono italic">* {error}</p>}
           </form>
         </section>
 

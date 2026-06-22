@@ -27,10 +27,10 @@ export default function RegisterPage() {
       return;
     }
 
-    const isRegistered = await register(email, password, name);
+    const { success, error } = await register(email, password, name);
      
-    if (isRegistered) router.push("/");
-    else setError("Registration failed. Please try again.");
+    if (success) router.push("/");
+    else setError(error || "Registration failed. Please try again.");
   };
 
   return (
