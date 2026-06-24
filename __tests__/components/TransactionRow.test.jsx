@@ -115,4 +115,48 @@ describe("TransactionRow", () => {
       expect(mockOnEdit).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe("category updates", () => {
+    it("clears category display when transaction category becomes null", () => {
+      const { rerender } = render(
+        <TransactionRow transaction={incomeTransaction} onEdit={mockOnEdit} categories={mockCategories} />
+      );
+      expect(screen.getByText("Salary")).toBeInTheDocument();
+
+      rerender(
+        <TransactionRow
+          transaction={{ ...incomeTransaction, category: null }}
+          onEdit={mockOnEdit}
+          categories={mockCategories}
+        />
+      );
+      expect(screen.queryByText("Salary")).not.toBeInTheDocument();
+    });
+
+    it("updates category display when categories prop changes", () => {
+      const { rerender } = render(
+        <TransactionRow transaction={incomeTransaction} onEdit={mockOnEdit} categories={mockCategories} />
+      );
+      expect(screen.getByText("Salary")).toBeInTheDocument();
+
+      rerender(
+        <TransactionRow
+          transaction={incomeTransaction}
+          onEdit={mockOnEdit}
+          categories={[{ uid: "cat-1", name: "Updated Salary", type: "income", endDate: null }]}
+        />
+      );
+      expect(screen.getByText("Updated Salary")).toBeInTheDocument();
+    });
+  });
+
+  describe("drag behaviour", () => {
+    it("sets transactionId on dragStart", () => {
+      render(<TransactionRow transaction={incomeTransaction} onEdit={mockOnEdit} categories={mockCategories} />);
+      const row = screen.getByText("June salary").closest("div");
+      const mockSetData = jest.fn();
+      fireEvent.dragStart(row, { dataTransfer: { setData: mockSetData } });
+      expect(mockSetData).toHaveBeenCalledWith("transactionId", "tx-1");
+    });
+  });
 });

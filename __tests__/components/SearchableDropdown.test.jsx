@@ -27,33 +27,25 @@ describe("SearchableDropdown", () => {
   describe("filtering", () => {
     it("shows matching results when typing", () => {
       render(<SearchableDropdown array={mockUsers} onClick={mockOnClick} />);
-      fireEvent.change(screen.getByPlaceholderText("Search by email..."), {
-        target: { value: "alice" },
-      });
+      fireEvent.change(screen.getByPlaceholderText("Search by email..."), { target: { value: "alice" } });
       expect(screen.getByText("alice@test.com")).toBeInTheDocument();
     });
 
     it("does not show non-matching results", () => {
       render(<SearchableDropdown array={mockUsers} onClick={mockOnClick} />);
-      fireEvent.change(screen.getByPlaceholderText("Search by email..."), {
-        target: { value: "alice" },
-      });
+      fireEvent.change(screen.getByPlaceholderText("Search by email..."), { target: { value: "alice" } });
       expect(screen.queryByText("bob@test.com")).not.toBeInTheDocument();
     });
 
     it("is case insensitive", () => {
       render(<SearchableDropdown array={mockUsers} onClick={mockOnClick} />);
-      fireEvent.change(screen.getByPlaceholderText("Search by email..."), {
-        target: { value: "ALICE" },
-      });
+      fireEvent.change(screen.getByPlaceholderText("Search by email..."), { target: { value: "ALICE" } });
       expect(screen.getByText("alice@test.com")).toBeInTheDocument();
     });
 
     it("shows multiple results when multiple match", () => {
       render(<SearchableDropdown array={mockUsers} onClick={mockOnClick} />);
-      fireEvent.change(screen.getByPlaceholderText("Search by email..."), {
-        target: { value: "test.com" },
-      });
+      fireEvent.change(screen.getByPlaceholderText("Search by email..."), { target: { value: "test.com" } });
       expect(screen.getByText("alice@test.com")).toBeInTheDocument();
       expect(screen.getByText("bob@test.com")).toBeInTheDocument();
       expect(screen.getByText("charlie@test.com")).toBeInTheDocument();
@@ -71,18 +63,14 @@ describe("SearchableDropdown", () => {
   describe("selecting an item", () => {
     it("calls onClick with the selected user", () => {
       render(<SearchableDropdown array={mockUsers} onClick={mockOnClick} />);
-      fireEvent.change(screen.getByPlaceholderText("Search by email..."), {
-        target: { value: "alice" },
-      });
+      fireEvent.change(screen.getByPlaceholderText("Search by email..."), { target: { value: "alice" } });
       fireEvent.mouseDown(screen.getByText("alice@test.com"));
       expect(mockOnClick).toHaveBeenCalledWith(mockUsers[0]);
     });
 
     it("calls onClick exactly once", () => {
       render(<SearchableDropdown array={mockUsers} onClick={mockOnClick} />);
-      fireEvent.change(screen.getByPlaceholderText("Search by email..."), {
-        target: { value: "alice" },
-      });
+      fireEvent.change(screen.getByPlaceholderText("Search by email..."), { target: { value: "alice" } });
       fireEvent.mouseDown(screen.getByText("alice@test.com"));
       expect(mockOnClick).toHaveBeenCalledTimes(1);
     });
@@ -97,9 +85,7 @@ describe("SearchableDropdown", () => {
 
     it("closes the dropdown after selecting", () => {
       render(<SearchableDropdown array={mockUsers} onClick={mockOnClick} />);
-      fireEvent.change(screen.getByPlaceholderText("Search by email..."), {
-        target: { value: "alice" },
-      });
+      fireEvent.change(screen.getByPlaceholderText("Search by email..."), { target: { value: "alice" } });
       fireEvent.mouseDown(screen.getByText("alice@test.com"));
       expect(screen.queryByText("alice@test.com")).not.toBeInTheDocument();
     });
@@ -108,10 +94,26 @@ describe("SearchableDropdown", () => {
   describe("keyboard", () => {
     it("closes the dropdown on Escape", () => {
       render(<SearchableDropdown array={mockUsers} onClick={mockOnClick} />);
-      fireEvent.change(screen.getByPlaceholderText("Search by email..."), {
-        target: { value: "alice" },
-      });
+      fireEvent.change(screen.getByPlaceholderText("Search by email..."), { target: { value: "alice" } });
       fireEvent.keyDown(screen.getByText("alice@test.com"), { key: "Escape" });
+      expect(screen.queryByText("alice@test.com")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("blur behaviour", () => {
+    it("reopens dropdown on focus if search term is not empty", () => {
+      render(<SearchableDropdown array={mockUsers} onClick={mockOnClick} />);
+      const input = screen.getByPlaceholderText("Search by email...");
+      fireEvent.change(input, { target: { value: "alice" } });
+      fireEvent.blur(input);
+      fireEvent.focus(input);
+      expect(screen.getByText("alice@test.com")).toBeInTheDocument();
+    });
+
+    it("does not reopen dropdown on focus if search term is empty", () => {
+      render(<SearchableDropdown array={mockUsers} onClick={mockOnClick} />);
+      const input = screen.getByPlaceholderText("Search by email...");
+      fireEvent.focus(input);
       expect(screen.queryByText("alice@test.com")).not.toBeInTheDocument();
     });
   });
