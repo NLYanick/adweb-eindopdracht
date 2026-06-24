@@ -20,8 +20,13 @@ describe("useMonthNavigation", () => {
 
     it("returns a formatted month label", () => {
       const { result } = renderHook(() => useMonthNavigation());
-      expect(result.current.monthLabel).toMatch(/June/);
-      expect(result.current.monthLabel).toMatch(/2026/);
+
+      const expected = FIXED_DATE.toLocaleString("default", {
+        month: "long",
+        year: "numeric",
+      });
+
+      expect(result.current.monthLabel).toBe(expected);
     });
   });
 
@@ -65,13 +70,25 @@ describe("useMonthNavigation", () => {
     it("updates label after navigating forward", () => {
       const { result } = renderHook(() => useMonthNavigation());
       act(() => result.current.nextMonth());
-      expect(result.current.monthLabel).toMatch(/July/);
+
+      const expected = new Date(2026, 6).toLocaleString("default", {
+        month: "long",
+        year: "numeric",
+      });
+
+      expect(result.current.monthLabel).toBe(expected);
     });
 
     it("updates label after navigating backward", () => {
       const { result } = renderHook(() => useMonthNavigation());
       act(() => result.current.prevMonth());
-      expect(result.current.monthLabel).toMatch(/May/);
+
+      const expected = new Date(2026, 4).toLocaleString("default", {
+        month: "long",
+        year: "numeric",
+      });
+
+      expect(result.current.monthLabel).toBe(expected);
     });
   });
 });
