@@ -16,6 +16,8 @@ export default function TransactionRow({ transaction, onEdit, categories }: Prop
   );
   const editButtonRef = useRef<HTMLButtonElement>(null);
 
+  const transactionDate = new Date(transaction.date).toLocaleDateString();
+
   useEffect(() => {
     if (!transaction.category && category) setCategory(null);
   }, [transaction, category]);
@@ -46,7 +48,7 @@ export default function TransactionRow({ transaction, onEdit, categories }: Prop
           </h3>
           <div className="flex items-center gap-2 mt-0.5">
             <span className="font-mono text-[10px] text-gray-400 uppercase tracking-wide">
-              {transaction.date}
+              {transactionDate}
             </span>
             {category && (
               <span className="font-mono text-[10px] tracking-wide px-2 py-0.5 rounded-full border border-gray-200 text-gray-500">
