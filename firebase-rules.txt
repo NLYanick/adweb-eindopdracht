@@ -1,0 +1,78 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /budgetbooks/{budgetbookId} {
+      function isOwnerOrShared(data) {
+        return request.auth.uid == data.owner
+          || (data.keys().hasAny(['sharedWith']) && request.auth.uid in data.sharedWith);
+      }
+
+      allow read: if request.auth != null && isOwnerOrShared(resource.data);
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.owner;
+      allow update: if request.auth != null
+        && isOwnerOrShared(resource.data)
+        && (
+          resource.data.archived == true
+            ? request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archived'])
+            : true
+        );
+      allow delete: if request.auth != null && isOwnerOrShared(resource.data);
+    }
+
+    match /users/{userId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /transactions/{transactionId} {
+      function canAccessBudgetbook(budgetbookId) {
+        let b = get(/databases/$(database)/documents/budgetbooks/$(budgetbookId)).data;
+        return request.auth.uid == b.owner
+          || (b.keys().hasAny(['sharedWith']) && request.auth.uid in b.sharedWith);
+      }
+
+      allow read: if request.auth != null
+        && canAccessBudgetbook(resource.data.budgetbook);
+
+      allow create: if request.auth != null
+        && canAccessBudgetbook(request.resource.data.budgetbook)
+        && request.resource.data.amount is number
+        && request.resource.data.amount != 0
+        && request.resource.data.date is string
+        && request.resource.data.date.size() == 10
+        && request.resource.data.budgetbook is string
+        && request.resource.data.budgetbook.size() > 0
+        && (!("category" in request.resource.data) || request.resource.data.category == null || request.resource.data.category.size() > 0);
+
+      allow update, delete: if request.auth != null
+        && canAccessBudgetbook(resource.data.budgetbook);
+    }
+
+    match /categories/{categoryId} {
+      function canAccessBudgetbook(budgetbookId) {
+        let b = get(/databases/$(database)/documents/budgetbooks/$(budgetbookId)).data;
+        return request.auth.uid == b.owner
+          || (b.keys().hasAny(['sharedWith']) && request.auth.uid in b.sharedWith);
+      }
+
+      allow read: if request.auth != null
+        && canAccessBudgetbook(resource.data.budgetbook);
+
+      allow create: if request.auth != null
+        && canAccessBudgetbook(request.resource.data.budgetbook)
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && (
+        	request.resource.data.budget == null
+         	|| (
+            request.resource.data.budget is number
+            && request.resource.data.budget > 0
+          )
+       	)
+        && request.resource.data.type in ['income', 'expense']
+        && (!("endDate" in request.resource.data) || request.resource.data.endDate == null || request.resource.data.endDate is string);
+
+      allow update, delete: if request.auth != null
+        && canAccessBudgetbook(resource.data.budgetbook);
+    }
+  }
+}
